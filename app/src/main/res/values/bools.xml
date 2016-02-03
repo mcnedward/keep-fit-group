@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <bool name="useHighPassFilterDefaultValue">true</bool>
+    <bool name="shouldPlotXDefaultValue">true</bool>
+    <bool name="shouldPlotYDefaultValue">true</bool>
+    <bool name="shouldPlotZDefaultValue">true</bool>
+    <bool name="shouldPlotAccelDefaultValue">true</bool>
+</resources>

@@ -1,0 +1,17 @@
+<resources>
+    <string name="app_name">Accelerometer</string>
+    <string name="action_settings">Settings</string>
+    <string name="movementDetectedText">Movement Detected</string>
+    <string name="selectSensorSectionHeading">Select Sensor</string>
+    <string name="accelerometerLabel">Accelerometer</string>
+    <string name="linearAccelerationSensorLabel">Linear Acceleration</string>
+    <string name="optionsSectionHeading">Options</string>
+    <string name="enableHighPassFilterLabel">Enable High-Pass Filter</string>
+    <string name="readingAccelerationData">Reading Acceleration Data</string>
+    <string name="startReadingAccelerationData">Start Reading Sensor</string>
+    <string name="plotDataSelectorHeading">Toggle Plotted Data</string>
+    <string name="shouldPlotAccelDataLabel">Acceleration</string>
+    <string name="shouldPlotXDataLabel">X - Data</string>
+    <string name="shouldPlotYDataLabel">Y - Data</string>
+    <string name="shouldPlotZDataLabel">Z - Data</string>
+</resources>
