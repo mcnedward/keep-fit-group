@@ -154,7 +154,7 @@ public class DetermineMovementActivity extends Activity {
 
     private void readSensor(String title, File outFile, int sensorId) {
         _xyPlot.setTitle(title);
-        _sensorListener = new AccelerationEventListener(_xyPlot, _useHighPassFilter, outFile,
+        _sensorListener = new AccelerationEventListener(_xyPlot, _useHighPassFilter, false, outFile,
                 getString(R.string.movementDetectedText));
         registerPlotDataListener(_sensorListener);
         setPlotStatusForListeners();

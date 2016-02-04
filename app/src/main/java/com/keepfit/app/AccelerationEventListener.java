@@ -17,17 +17,19 @@ import android.util.Log;
 import com.androidplot.xy.LineAndPointFormatter;
 import com.androidplot.xy.SimpleXYSeries;
 import com.androidplot.xy.XYPlot;
+import com.keepfit.app.sensor.accelerometer.BaseGravityFilter;
+import com.keepfit.app.sensor.accelerometer.Constants;
+import com.keepfit.app.sensor.accelerometer.GravityFilter;
+import com.keepfit.app.sensor.accelerometer.HighPass;
+import com.keepfit.app.sensor.accelerometer.LowPass;
 
 class AccelerationEventListener implements SensorEventListener, PlotDataEventListener {
     private final String _tag;
     private static final char CSV_DELIM = ',';
     private static final int RMS_MOVEMENT_THRESHOLD = 2;
     private static final String CSV_HEADER = "Time,X Axis,Y Axis,Z Axis,Acceleration";
-    private static final float ALPHA = 0.8f;
-    private static final int HIGH_PASS_MINIMUM = 10;
     private static final int MAX_SERIES_SIZE = 30;
     private static final int CHART_REFRESH = 125;
-    private static final int VECTOR_SIZE = 3;
     private static final int MILLISEC_FACTOR = 1000000;
 
     private PrintWriter _printWriter;
@@ -40,17 +42,27 @@ class AccelerationEventListener implements SensorEventListener, PlotDataEventLis
     private SimpleXYSeries _accelerationSeries;
     private XYPlot _xyPlot;
     private long _lastChartRefresh;
-    private boolean _useHighPassFilter;
     private String _movementText;
     private boolean _shouldPlotX;
     private boolean _shouldPlotY;
     private boolean _shouldPlotZ;
     private boolean _shouldPlotAccel;
+    private GravityFilter _lowPass;
+    private GravityFilter _highPass;
+    private boolean _useHighPassFilter;
+    private boolean _useLowPassFilter;
 
-    public AccelerationEventListener(XYPlot xyPlot, boolean useHighPassFilter, File dataFile, String movementText) {
+    public AccelerationEventListener(XYPlot xyPlot, boolean useHighPassFilter, boolean useLowPassFilter, File dataFile, String movementText) {
         _tag = this.getClass().getSimpleName();
         _xyPlot = xyPlot;
         _useHighPassFilter = useHighPassFilter;
+        _useLowPassFilter = useLowPassFilter;
+        if (_useHighPassFilter)
+            _highPass = new HighPass(Constants.HIGH_PASS_ALPHA);
+
+        if (_useLowPassFilter)
+            _lowPass = new LowPass(Constants.LOW_PASS_ALPHA);
+
         _movementText = movementText;
 
         _xAxisSeries = new SimpleXYSeries("X Axis");
@@ -58,7 +70,7 @@ class AccelerationEventListener implements SensorEventListener, PlotDataEventLis
         _zAxisSeries = new SimpleXYSeries("Z Axis");
         _accelerationSeries = new SimpleXYSeries("Acceleration");
 
-        _gravity = new float[VECTOR_SIZE];
+        _gravity = new float[Constants.GRAVITY_VECTOR_SIZE];
         _startTime = SystemClock.uptimeMillis();
         _highPassCount = 0;
 
@@ -99,11 +111,16 @@ class AccelerationEventListener implements SensorEventListener, PlotDataEventLis
         float[] accelerationVector = event.values.clone();
         long eventTimeStamp = event.timestamp;
 
+
+        if (_useLowPassFilter) {
+            accelerationVector = _lowPass.filter(accelerationVector[0], accelerationVector[1], accelerationVector[2]);
+        }
+
         if (_useHighPassFilter) {
-            accelerationVector = highPass(accelerationVector[0], accelerationVector[1], accelerationVector[2]);
+            accelerationVector = _highPass.filter(accelerationVector[0], accelerationVector[1], accelerationVector[2]);
         }
         // HPF only completes filtering out gravity after a set threshold of data points (HIGH_PASS_MINIMUM)
-        if (!_useHighPassFilter || (++_highPassCount >= HIGH_PASS_MINIMUM)) {
+        if (!_useHighPassFilter || (++_highPassCount >= Constants.HIGH_PASS_MINIMUM)) {
             double rmsAcceleration = getAccelerationRMS(accelerationVector);
 
             writeSensorData(_printWriter, event.timestamp, accelerationVector[0], accelerationVector[1], accelerationVector[2], rmsAcceleration);
@@ -173,26 +190,6 @@ class AccelerationEventListener implements SensorEventListener, PlotDataEventLis
             series.removeFirst();
         }
         series.addLast(timestamp, value);
-    }
-
-    /**
-     * This method derived from the Android documentation and is available under
-     * the Apache 2.0 license.
-     *
-     * @see "http://developer.android.com/reference/android/hardware/SensorEvent.html"
-     */
-    private float[] highPass(float x, float y, float z) {
-        float[] filteredValues = new float[VECTOR_SIZE];
-
-        _gravity[0] = ALPHA * _gravity[0] + (1 - ALPHA) * x;
-        _gravity[1] = ALPHA * _gravity[1] + (1 - ALPHA) * y;
-        _gravity[2] = ALPHA * _gravity[2] + (1 - ALPHA) * z;
-
-        filteredValues[0] = x - _gravity[0];
-        filteredValues[1] = y - _gravity[1];
-        filteredValues[2] = z - _gravity[2];
-
-        return filteredValues;
     }
 
     public void stop() {
