@@ -27,11 +27,12 @@ import java.util.Calendar;
 
 public class DetermineMovementActivity extends Activity {
     private static final String TAG = "DetermineMoveActivity";
-    private static final int RATE = SensorManager.SENSOR_DELAY_NORMAL;
+    //private static final int RATE = SensorManager.SENSOR_DELAY_NORMAL;
+    private static final int RATE = 10000; // (microsec -> sample rate = 100Hz)
     private static final String USE_HIGH_PASS_FILTER_PREFERENCE_KEY = "USE_HIGH_PASS_FILTER_PREFERENCE_KEY";
     private static final String SELECTED_SENSOR_TYPE_PREFERENCE_KEY = "SELECTED_SENSOR_TYPE_PREFERENCE_KEY";
     private Vector<PlotDataEventListener> _plotDataListeners;
-    private static final String X_LABEL = "Elapsed Time (milliseconds)";
+    private static final String X_LABEL = "Elapsed Time (microseconds)";
     private static final String Y_LABEL = "Acceleration (metres/sec^2)";
     private static final String LINEAR_ACCEL_LABEL = "LinearAccelerationSensor";
     private static final String ACCEL_LABEL = "Accelerometer";
@@ -189,8 +190,8 @@ public class DetermineMovementActivity extends Activity {
             DateFormat df = new SimpleDateFormat("EEE_d_MMM_ yyyy_HHmm");
             String date = df.format(Calendar.getInstance().getTime());
 
-            File dataOutFile = null;
-            String title = "";
+            File dataOutFile;
+            String title;
             if (_selectedSensorType == Sensor.TYPE_ACCELEROMETER) {
                 title = "Sensor.TYPE_ACCELEROMETER";
                 dataOutFile = new File(getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS),
