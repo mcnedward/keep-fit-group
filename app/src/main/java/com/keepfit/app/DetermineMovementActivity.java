@@ -17,6 +17,7 @@ import android.util.Log;
 import com.androidplot.xy.BoundaryMode;
 import com.androidplot.xy.XYPlot;
 import com.androidplot.xy.XYStepMode;
+import com.keepfit.app.sensor.accelerometer.Constants;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
@@ -28,7 +29,8 @@ import java.util.Calendar;
 public class DetermineMovementActivity extends Activity {
     private static final String TAG = "DetermineMoveActivity";
     //private static final int RATE = SensorManager.SENSOR_DELAY_NORMAL;
-    private static final int RATE = 10000; // (microsec -> sample rate = 100Hz)
+
+    private static final String USE_LOW_PASS_FILTER_PREFERENCE_KEY = "USE_LOW_PASS_FILTER_PREFERENCE_KEY";
     private static final String USE_HIGH_PASS_FILTER_PREFERENCE_KEY = "USE_HIGH_PASS_FILTER_PREFERENCE_KEY";
     private static final String SELECTED_SENSOR_TYPE_PREFERENCE_KEY = "SELECTED_SENSOR_TYPE_PREFERENCE_KEY";
     private Vector<PlotDataEventListener> _plotDataListeners;
@@ -40,10 +42,11 @@ public class DetermineMovementActivity extends Activity {
     private static final int UPPER_BOUNDARY = 15;
     private static final int LOWER_BOUNDARY = -15;
 
-    ToggleButton _toggleReadSensorButton;
+    private ToggleButton _toggleReadSensorButton;
     private SensorManager _sensorManager;
     private RadioGroup _sensorSelector;
     private CheckBox _highPassFilterCheckBox;
+    private CheckBox _lowPassFilterCheckBox;
     private CheckBox _plotXCheckBox;
     private CheckBox _plotYCheckBox;
     private CheckBox _plotZCheckBox;
@@ -52,6 +55,7 @@ public class DetermineMovementActivity extends Activity {
     private int _selectedSensorType;
     private boolean _readingAccelerationData;
     private boolean _useHighPassFilter;
+    private boolean _useLowPassFilter;
     private boolean _shouldPlotX;
     private boolean _shouldPlotY;
     private boolean _shouldPlotZ;
@@ -59,6 +63,8 @@ public class DetermineMovementActivity extends Activity {
     private boolean _hasSensor = false;
     private AccelerationEventListener _sensorListener;
     private XYPlot _xyPlot;
+    String _hpfLabel;
+    String _lfLabel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -86,6 +92,12 @@ public class DetermineMovementActivity extends Activity {
         _useHighPassFilter = _preferences.getBoolean(USE_HIGH_PASS_FILTER_PREFERENCE_KEY,
                 _useHighPassFilter);
         ((CheckBox) findViewById(R.id.highPassFilterCheckBox)).setChecked(_useHighPassFilter);
+
+        _lowPassFilterCheckBox = (CheckBox) findViewById(R.id.lowPassFilterCheckBox);
+        _useLowPassFilter = getResources().getBoolean(R.bool.useLowPassFilterDefaultValue);
+        _useLowPassFilter = _preferences.getBoolean(USE_HIGH_PASS_FILTER_PREFERENCE_KEY,
+                _useLowPassFilter);
+        ((CheckBox) findViewById(R.id.lowPassFilterCheckBox)).setChecked(_useLowPassFilter);
 
         _plotXCheckBox = (CheckBox) findViewById(R.id.xDataPlotCheckBox);
         _shouldPlotX = getResources().getBoolean(R.bool.shouldPlotXDefaultValue);
@@ -159,7 +171,7 @@ public class DetermineMovementActivity extends Activity {
         registerPlotDataListener(_sensorListener);
         setPlotStatusForListeners();
         if (!_sensorManager.registerListener(_sensorListener,
-                _sensorManager.getDefaultSensor(sensorId), RATE)) {
+                _sensorManager.getDefaultSensor(sensorId), Constants.SAMPLE_RATE)) {
             Log.e(TAG, "Failed to register sensor listener as device doesn't have : " + title);
             _hasSensor = false;
             stopReadingAccelerationData();
@@ -183,6 +195,7 @@ public class DetermineMovementActivity extends Activity {
                 _sensorSelector.getChildAt(i).setEnabled(false);
             }
             _highPassFilterCheckBox.setEnabled(false);
+            _lowPassFilterCheckBox.setEnabled(false);
 
             // Enable plot controls
             setPlotCheckBoxEnabled(true);
@@ -192,18 +205,31 @@ public class DetermineMovementActivity extends Activity {
 
             File dataOutFile;
             String title;
+
             if (_selectedSensorType == Sensor.TYPE_ACCELEROMETER) {
                 title = "Sensor.TYPE_ACCELEROMETER";
                 dataOutFile = new File(getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS),
-                        ACCEL_LABEL + date + ".csv");
+                        ACCEL_LABEL + date +  getFilterLabels() + ".csv");
             } else {
                 title = "Sensor.TYPE_LINEAR_ACCELERATION";
                 dataOutFile = new File(getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS),
-                        LINEAR_ACCEL_LABEL + date + ".csv");
+                        LINEAR_ACCEL_LABEL + date + getFilterLabels() + ".csv");
             }
 
             readSensor(title, dataOutFile, _selectedSensorType);
         }
+    }
+
+    private String getFilterLabels()
+    {
+        String label = "";
+        if(_useHighPassFilter)
+            label = "_HPF_";
+
+        if(_useLowPassFilter)
+            label += "_LPF_";
+
+        return label;
     }
 
     private void stopReadingAccelerationData() {
@@ -221,6 +247,7 @@ public class DetermineMovementActivity extends Activity {
 
             setPlotCheckBoxEnabled(false);
             _highPassFilterCheckBox.setEnabled(true);
+            _lowPassFilterCheckBox.setEnabled(true);
             _readingAccelerationData = false;
 
             if (!_hasSensor) Log.d(TAG, "Stopped reading acceleration data");
@@ -243,6 +270,12 @@ public class DetermineMovementActivity extends Activity {
                 .apply();
     }
 
+    public void onLowPassFilterCheckBoxClicked(View view) {
+        _useLowPassFilter= ((CheckBox) view).isChecked();
+        _preferences.edit().putBoolean(USE_LOW_PASS_FILTER_PREFERENCE_KEY, _useHighPassFilter)
+                .apply();
+    }
+
     public void onPlotXCheckBoxClicked(View view) {
         _shouldPlotX = ((CheckBox) view).isChecked();
         firePlotData(new PlotDataEventArgs(DataSeries.X, _shouldPlotX));
@@ -258,11 +291,11 @@ public class DetermineMovementActivity extends Activity {
         firePlotData(new PlotDataEventArgs(DataSeries.Z, _shouldPlotZ));
     }
 
+
     public void onPlotAccelCheckBoxClicked(View view) {
         _shouldPlotAccel = ((CheckBox) view).isChecked();
         firePlotData(new PlotDataEventArgs(DataSeries.ACCELERATION, _shouldPlotAccel));
     }
-
 
     public synchronized void registerPlotDataListener(PlotDataEventListener listener) {
         if (!_plotDataListeners.contains(listener)) {
@@ -288,5 +321,4 @@ public class DetermineMovementActivity extends Activity {
             listener.onPlotDataChanged(e);
         }
     }
-
 }

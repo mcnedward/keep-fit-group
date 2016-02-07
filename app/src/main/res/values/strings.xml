@@ -7,6 +7,7 @@
     <string name="linearAccelerationSensorLabel">Linear Acceleration</string>
     <string name="optionsSectionHeading">Options</string>
     <string name="enableHighPassFilterLabel">Enable High-Pass Filter</string>
+    <string name="enableLowPassFilterLabel">Enable Low-Pass Filter</string>
     <string name="readingAccelerationData">Reading Acceleration Data</string>
     <string name="startReadingAccelerationData">Start Reading Sensor</string>
     <string name="plotDataSelectorHeading">Toggle Plotted Data</string>

@@ -5,4 +5,5 @@
     <bool name="shouldPlotYDefaultValue">true</bool>
     <bool name="shouldPlotZDefaultValue">true</bool>
     <bool name="shouldPlotAccelDefaultValue">true</bool>
+    <bool name="useLowPassFilterDefaultValue">true</bool>
 </resources>

@@ -44,32 +44,34 @@
     <TextView
         android:id="@+id/optionsLabel"
         style="@style/apptext"
-        android:layout_alignBottom="@+id/zDataPlotCheckBox"
-        android:layout_alignParentStart="true"
-        android:text="@string/optionsSectionHeading"/>
+        android:text="@string/optionsSectionHeading"
+        android:layout_below="@+id/sensorSelector"
+        android:layout_alignParentEnd="true"/>
 
 
     <CheckBox
         android:id="@+id/highPassFilterCheckBox"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_above="@+id/readAccelerationDataToggleButton"
-        android:layout_alignParentStart="true"
         android:checked="@bool/useHighPassFilterDefaultValue"
         android:onClick="onHighPassFilterCheckBoxClicked"
-        android:text="@string/enableHighPassFilterLabel"/>
+        android:text="@string/enableHighPassFilterLabel"
+        android:layout_below="@+id/lowPassFilterCheckBox"
+        android:layout_alignParentStart="false"
+        android:nestedScrollingEnabled="true"
+        android:layout_alignParentLeft="false"/>
 
     <ToggleButton
         android:id="@+id/readAccelerationDataToggleButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentStart="true"
-        android:layout_below="@+id/accelDataPlotCheckBox"
         android:layout_marginTop="27dp"
         android:checked="false"
         android:onClick="onReadAccelerationDataToggleButtonClicked"
         android:textOff="@string/startReadingAccelerationData"
-        android:textOn="@string/readingAccelerationData"/>
+        android:textOn="@string/readingAccelerationData"
+        android:layout_below="@+id/highPassFilterCheckBox"/>
 
     <com.androidplot.xy.XYPlot
         android:id="@+id/XYPlot"
@@ -88,56 +90,71 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignEnd="@+id/sensorSelectorLabel"
-        android:layout_alignParentTop="true"
         android:layout_marginEnd="26dp"
-        android:text="@string/plotDataSelectorHeading"/>
+        android:text="@string/plotDataSelectorHeading"
+        android:layout_alignParentTop="true"/>
 
     <CheckBox
         android:id="@+id/xDataPlotCheckBox"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignEnd="@+id/sensorSelectorLabel"
-        android:layout_alignStart="@+id/plotDataSelectorLabel"
-        android:layout_alignTop="@+id/sensorSelector"
         android:checked="true"
         android:onClick="onPlotXCheckBoxClicked"
-        android:text="@string/shouldPlotXDataLabel"/>
+        android:text="@string/shouldPlotXDataLabel"
+        android:layout_below="@+id/sensorSelectorLabel"
+        android:layout_alignStart="@+id/plotDataSelectorLabel"/>
 
     <CheckBox
         android:id="@+id/yDataPlotCheckBox"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignStart="@+id/xDataPlotCheckBox"
-        android:layout_below="@+id/xDataPlotCheckBox"
         android:checked="true"
         android:onClick="onPlotYCheckBoxClicked"
-        android:text="@string/shouldPlotYDataLabel"/>
+        android:text="@string/shouldPlotYDataLabel"
+        android:layout_above="@+id/optionsLabel"
+        android:layout_alignStart="@+id/xDataPlotCheckBox"
+        android:layout_below="@+id/xDataPlotCheckBox"
+        android:layout_alignParentTop="false"
+        android:layout_alignParentRight="false"
+        android:layout_alignParentBottom="false"/>
 
     <CheckBox
         android:id="@+id/zDataPlotCheckBox"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentEnd="true"
-        android:layout_alignStart="@+id/yDataPlotCheckBox"
-        android:layout_below="@+id/yDataPlotCheckBox"
         android:checked="true"
         android:onClick="onPlotZCheckBoxClicked"
-        android:text="@string/shouldPlotZDataLabel"/>
+        android:text="@string/shouldPlotZDataLabel"
+        android:layout_below="@+id/yDataPlotCheckBox"
+        android:layout_alignStart="@+id/yDataPlotCheckBox"/>
 
     <CheckBox
         android:id="@+id/accelDataPlotCheckBox"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignStart="@+id/zDataPlotCheckBox"
-        android:layout_below="@+id/zDataPlotCheckBox"
         android:checked="true"
         android:onClick="onPlotAccelCheckBoxClicked"
-        android:text="@string/shouldPlotAccelDataLabel"/>
+        android:text="@string/shouldPlotAccelDataLabel"
+        android:layout_below="@+id/zDataPlotCheckBox"
+        android:layout_alignStart="@+id/zDataPlotCheckBox"/>
+
+    <CheckBox
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/enableLowPassFilterLabel"
+        android:id="@+id/lowPassFilterCheckBox"
+        android:layout_below="@+id/optionsLabel"
+        android:onClick="onLowPassFilterCheckBoxClicked"
+        android:layout_alignParentStart="true"
+        android:layout_alignEnd="@+id/highPassFilterCheckBox"
+        android:checked="@bool/useLowPassFilterDefaultValue"
+        android:enabled="true"
+        android:layout_alignParentLeft="false"/>
 
     <Space
-        android:layout_width="20px"
-        android:layout_height="20px"
-        android:layout_above="@+id/yDataPlotCheckBox"
-        android:layout_below="@+id/zDataPlotCheckBox"/>
+        android:layout_width="400dp"
+        android:layout_height="20dp"
+        android:layout_below="@+id/highPassFilterCheckBox"
+        />
 
 </RelativeLayout>
