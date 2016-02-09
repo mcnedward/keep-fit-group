@@ -1,5 +1,5 @@
 package com.keepfit.app.sensor.accelerometer;
 
-public interface GravityFilter {
+public interface AccelerometerFilter {
     float[] filter(float x, float y, float z);
 }

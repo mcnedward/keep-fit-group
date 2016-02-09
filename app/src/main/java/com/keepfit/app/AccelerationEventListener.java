@@ -17,9 +17,8 @@ import android.util.Log;
 import com.androidplot.xy.LineAndPointFormatter;
 import com.androidplot.xy.SimpleXYSeries;
 import com.androidplot.xy.XYPlot;
-import com.keepfit.app.sensor.accelerometer.BaseGravityFilter;
 import com.keepfit.app.sensor.accelerometer.Constants;
-import com.keepfit.app.sensor.accelerometer.GravityFilter;
+import com.keepfit.app.sensor.accelerometer.AccelerometerFilter;
 import com.keepfit.app.sensor.accelerometer.HighPass;
 import com.keepfit.app.sensor.accelerometer.LowPass;
 
@@ -47,8 +46,8 @@ class AccelerationEventListener implements SensorEventListener, PlotDataEventLis
     private boolean _shouldPlotY;
     private boolean _shouldPlotZ;
     private boolean _shouldPlotAccel;
-    private GravityFilter _lowPass;
-    private GravityFilter _highPass;
+    private AccelerometerFilter _lowPass;
+    private AccelerometerFilter _highPass;
     private boolean _useHighPassFilter;
     private boolean _useLowPassFilter;
 
@@ -70,7 +69,7 @@ class AccelerationEventListener implements SensorEventListener, PlotDataEventLis
         _zAxisSeries = new SimpleXYSeries("Z Axis");
         _accelerationSeries = new SimpleXYSeries("Acceleration");
 
-        _gravity = new float[Constants.GRAVITY_VECTOR_SIZE];
+        _gravity = new float[Constants.ACCELEROMETER_VECTOR_SIZE];
         _startTime = SystemClock.uptimeMillis();
         _highPassCount = 0;
 

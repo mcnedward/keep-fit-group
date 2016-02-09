@@ -5,7 +5,7 @@ package com.keepfit.app.sensor.accelerometer;
     * 0 ≤ alpha ≤ 1 ; a smaller value basically means more smoothing
     * See: http://en.wikipedia.org/wiki/Low-pass_filter#Discrete-time_realization
     */
-public class LowPass extends BaseGravityFilter {
+public class LowPass extends BaseAccelerometerFilter {
 
     private float[] _cachedValues;
 

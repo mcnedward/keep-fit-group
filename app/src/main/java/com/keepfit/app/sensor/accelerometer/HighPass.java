@@ -1,6 +1,6 @@
 package com.keepfit.app.sensor.accelerometer;
 
-public class HighPass extends BaseGravityFilter {
+public class HighPass extends BaseAccelerometerFilter {
 
     private final float[] _gravity;
 
