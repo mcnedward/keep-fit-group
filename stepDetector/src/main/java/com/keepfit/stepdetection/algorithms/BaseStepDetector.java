@@ -9,9 +9,19 @@ public abstract class BaseStepDetector implements StepDetector {
     private List<AccelerationData> _rawAccelerationData;
     private Vector<StepDetectedListener> _stepDetectedListeners;
 
-    private BaseStepDetector() {
+    protected BaseStepDetector() {
         _stepDetectedListeners = new Vector<>();
         reset();
+    }
+
+    protected void addRawAccelerationData(AccelerationData data) {
+
+        if(null == data) throw new IllegalArgumentException("ERROR: data cannot be null");
+        if (_rawAccelerationData != null) _rawAccelerationData.add(data);
+    }
+
+    public void reset() {
+        _rawAccelerationData = new ArrayList<>();
     }
 
     public synchronized void registerStepDetectedListener(StepDetectedListener listener) {
@@ -37,11 +47,6 @@ public abstract class BaseStepDetector implements StepDetector {
         for (StepDetectedListener listener : tempStepDetectedListeners) {
             listener.onStepDetected(e);
         }
-    }
-
-    protected void reset()
-    {
-        _rawAccelerationData =  new ArrayList<>();
     }
 
 }
