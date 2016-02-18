@@ -25,7 +25,7 @@ public abstract class BaseStepDetector implements StepDetector {
     }
 
     public synchronized void registerStepDetectedListener(StepDetectedListener listener) {
-        if (!_stepDetectedListeners.contains(listener)) {
+        if (listener != null && !_stepDetectedListeners.contains(listener)) {
             _stepDetectedListeners.add(listener);
         }
     }
