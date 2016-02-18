@@ -21,11 +21,12 @@ import com.keepfit.app.sensor.accelerometer.Constants;
 import com.keepfit.app.sensor.accelerometer.AccelerometerFilter;
 import com.keepfit.app.sensor.accelerometer.HighPass;
 import com.keepfit.app.sensor.accelerometer.LowPass;
+import com.keepfit.app.sensor.accelerometer.Util;
 
 class AccelerationEventListener implements SensorEventListener, PlotDataEventListener {
     private final String _tag;
     private static final char CSV_DELIM = ',';
-    private static final int RMS_MOVEMENT_THRESHOLD = 2;
+    private static final int THRESHOLD_FOR_MOVEMENT = 2;
     private static final String CSV_HEADER = "Time,X Axis,Y Axis,Z Axis,Acceleration";
     private static final int MAX_SERIES_SIZE = 30;
     private static final int CHART_REFRESH = 125;
@@ -33,7 +34,6 @@ class AccelerationEventListener implements SensorEventListener, PlotDataEventLis
 
     private PrintWriter _printWriter;
     private long _startTime;
-    private float[] _gravity;
     private int _highPassCount;
     private SimpleXYSeries _xAxisSeries;
     private SimpleXYSeries _yAxisSeries;
@@ -69,7 +69,6 @@ class AccelerationEventListener implements SensorEventListener, PlotDataEventLis
         _zAxisSeries = new SimpleXYSeries("Z Axis");
         _accelerationSeries = new SimpleXYSeries("Acceleration");
 
-        _gravity = new float[Constants.ACCELEROMETER_VECTOR_SIZE];
         _startTime = SystemClock.uptimeMillis();
         _highPassCount = 0;
 
@@ -120,13 +119,12 @@ class AccelerationEventListener implements SensorEventListener, PlotDataEventLis
         }
         // HPF only completes filtering out gravity after a set threshold of data points (HIGH_PASS_MINIMUM)
         if (!_useHighPassFilter || (++_highPassCount >= Constants.HIGH_PASS_MINIMUM)) {
-            double rmsAcceleration = getAccelerationRMS(accelerationVector);
+            double magnitude = Util.magnitude(accelerationVector);
 
-            writeSensorData(_printWriter, event.timestamp, accelerationVector[0], accelerationVector[1], accelerationVector[2], rmsAcceleration);
-            plotData(accelerationVector, rmsAcceleration, eventTimeStamp);
+            writeSensorData(_printWriter, event.timestamp, accelerationVector[0], accelerationVector[1], accelerationVector[2], magnitude);
+            plotData(accelerationVector, magnitude, eventTimeStamp);
 
-            // rmsAcceleration must be above threshold to qualify as movement
-            if (rmsAcceleration > RMS_MOVEMENT_THRESHOLD) {
+            if (magnitude > THRESHOLD_FOR_MOVEMENT) {
                 Log.i(_tag, _movementText);
             }
         }
@@ -163,25 +161,6 @@ class AccelerationEventListener implements SensorEventListener, PlotDataEventLis
                 _lastChartRefresh = current;
             }
         }
-    }
-
-    private double getAccelerationRMS(float[] values) {
-        if (values == null) throw new IllegalArgumentException("ERROR: values arg cannot be null");
-        if (values.length < 1)
-            throw new IllegalArgumentException("ERROR: values array arg cannot be empty");
-        return Math.sqrt(sumOfSquares(values));
-    }
-
-    private float sumOfSquares(float[] values) {
-        if (values == null) throw new IllegalArgumentException("ERROR: values arg cannot be null");
-        if (values.length < 1)
-            throw new IllegalArgumentException("ERROR: values array arg cannot be empty");
-        float sos = 0;
-        double squared = 2;
-        for (float f : values) {
-            sos += Math.pow(f, squared);
-        }
-        return sos;
     }
 
     private void addDataPoint(SimpleXYSeries series, Number timestamp, Number value) {
