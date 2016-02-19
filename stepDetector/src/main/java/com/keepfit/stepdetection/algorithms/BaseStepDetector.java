@@ -20,16 +20,25 @@ public abstract class BaseStepDetector implements StepDetector {
         if (_rawAccelerationData != null) _rawAccelerationData.add(data);
     }
 
+    protected void addRawAccelerationData(List<AccelerationData> data) {
+
+        if(null == data) throw new IllegalArgumentException("ERROR: data cannot be null");
+        if (_rawAccelerationData != null) _rawAccelerationData.addAll(data);
+    }
+
+    @Override
     public void reset() {
         _rawAccelerationData = new ArrayList<>();
     }
 
+    @Override
     public synchronized void registerStepDetectedListener(StepDetectedListener listener) {
         if (listener != null && !_stepDetectedListeners.contains(listener)) {
             _stepDetectedListeners.add(listener);
         }
     }
 
+    @Override
     public synchronized void unregisterStepDetectedListener(StepDetectedListener listener) {
         if (_stepDetectedListeners.contains(listener)) {
             _stepDetectedListeners.remove(listener);

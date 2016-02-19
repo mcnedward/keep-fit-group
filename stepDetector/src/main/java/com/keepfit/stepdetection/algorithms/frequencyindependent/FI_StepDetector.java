@@ -11,12 +11,17 @@ public class FI_StepDetector extends BaseStepDetector {
     }
 
     @Override
-    public void addAccelerationData(AccelerationData data) {
+    public void reset() {
+        super.reset();
+    }
 
+    @Override
+    public void addAccelerationData(AccelerationData data) {
+        super.addRawAccelerationData(data);
     }
 
     @Override
     public void addAccelerationData(List<AccelerationData> data) {
-
+        super.addRawAccelerationData(data);
     }
 }
