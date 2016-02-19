@@ -1,1 +1,2 @@
-include ':app', ':stepDetector'
+include ':app'
+include ':stepDetector'
