@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <bool name="enableRecordOnlyMode">false</bool>
     <bool name="useHighPassFilterDefaultValue">true</bool>
     <bool name="shouldPlotXDefaultValue">true</bool>
     <bool name="shouldPlotYDefaultValue">true</bool>

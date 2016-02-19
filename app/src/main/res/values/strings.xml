@@ -1,5 +1,8 @@
 <resources>
-    <string name="app_name">Accelerometer</string>
+    <string name="startReadingSensorData">Start</string>
+    <string name="recordModeLabel">Record Sensor Data</string>
+    <string name="stepCountModeLabel">Count Steps</string>
+    <string name="app_name">Step Counter</string>
     <string name="action_settings">Settings</string>
     <string name="movementDetectedText">Movement Detected</string>
     <string name="selectSensorSectionHeading">Select Sensor</string>
