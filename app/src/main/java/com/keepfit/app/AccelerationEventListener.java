@@ -17,6 +17,7 @@ import android.util.Log;
 import com.androidplot.xy.LineAndPointFormatter;
 import com.androidplot.xy.SimpleXYSeries;
 import com.androidplot.xy.XYPlot;
+import com.keepfit.app.angleAlgorithm.AngleAlgorithm;
 import com.keepfit.app.sensor.accelerometer.Constants;
 import com.keepfit.app.sensor.accelerometer.AccelerometerFilter;
 import com.keepfit.app.sensor.accelerometer.HighPass;
@@ -51,7 +52,9 @@ class AccelerationEventListener implements SensorEventListener, PlotDataEventLis
     private boolean _useHighPassFilter;
     private boolean _useLowPassFilter;
 
-    public AccelerationEventListener(XYPlot xyPlot, boolean useHighPassFilter, boolean useLowPassFilter, File dataFile, String movementText) {
+    private AngleAlgorithm angleAlgorithm;
+
+    public AccelerationEventListener(XYPlot xyPlot, boolean useHighPassFilter, boolean useLowPassFilter, File dataFile, String movementText, AngleAlgorithm angleAlgorithm) {
         _tag = this.getClass().getSimpleName();
         _xyPlot = xyPlot;
         _useHighPassFilter = useHighPassFilter;
@@ -71,6 +74,8 @@ class AccelerationEventListener implements SensorEventListener, PlotDataEventLis
 
         _startTime = SystemClock.uptimeMillis();
         _highPassCount = 0;
+
+        this.angleAlgorithm = angleAlgorithm;
 
         try {
             _printWriter = new PrintWriter(new BufferedWriter(new FileWriter(dataFile)));
@@ -123,6 +128,8 @@ class AccelerationEventListener implements SensorEventListener, PlotDataEventLis
 
             writeSensorData(_printWriter, event.timestamp, accelerationVector[0], accelerationVector[1], accelerationVector[2], magnitude);
             plotData(accelerationVector, magnitude, eventTimeStamp);
+
+            angleAlgorithm.notifyAccelerometerSensorChanged(eventTimeStamp, accelerationVector[0], accelerationVector[1], accelerationVector[2], magnitude);
 
             if (magnitude > THRESHOLD_FOR_MOVEMENT) {
                 Log.i(_tag, _movementText);

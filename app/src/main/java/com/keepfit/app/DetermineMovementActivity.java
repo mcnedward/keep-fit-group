@@ -17,6 +17,7 @@ import android.util.Log;
 import com.androidplot.xy.BoundaryMode;
 import com.androidplot.xy.XYPlot;
 import com.androidplot.xy.XYStepMode;
+import com.keepfit.app.angleAlgorithm.AngleAlgorithm;
 import com.keepfit.app.sensor.accelerometer.Constants;
 
 import java.io.File;
@@ -61,7 +62,11 @@ public class DetermineMovementActivity extends Activity {
     private boolean _shouldPlotZ;
     private boolean _shouldPlotAccel;
     private boolean _hasSensor = false;
+
     private AccelerationEventListener _sensorListener;
+    private GravityEventListener gravityEventListener;
+    private AngleAlgorithm angleAlgorithm;
+
     private XYPlot _xyPlot;
     String _hpfLabel;
     String _lfLabel;
@@ -71,6 +76,7 @@ public class DetermineMovementActivity extends Activity {
         super.onCreate(savedInstanceState);
         super.setContentView(R.layout.activity_determine_movement);
         _plotDataListeners = new Vector<>();
+        angleAlgorithm = new AngleAlgorithm();
 
         _readingAccelerationData = false;
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
@@ -167,7 +173,8 @@ public class DetermineMovementActivity extends Activity {
     private void readSensor(String title, File outFile, int sensorId) {
         _xyPlot.setTitle(title);
         _sensorListener = new AccelerationEventListener(_xyPlot, _useHighPassFilter, false, outFile,
-                getString(R.string.movementDetectedText));
+                getString(R.string.movementDetectedText), angleAlgorithm);
+        gravityEventListener = new GravityEventListener(angleAlgorithm);
         registerPlotDataListener(_sensorListener);
         setPlotStatusForListeners();
         if (!_sensorManager.registerListener(_sensorListener,
@@ -180,6 +187,8 @@ public class DetermineMovementActivity extends Activity {
             _readingAccelerationData = true;
             Log.d(TAG, "Started reading acceleration data");
         }
+        boolean registered = _sensorManager.registerListener(gravityEventListener, _sensorManager.getDefaultSensor(Sensor.TYPE_GRAVITY), Constants.SAMPLE_RATE);
+        Log.d(TAG, "Registered: " + registered);
     }
 
     private void startReadingAccelerationData() {
@@ -243,6 +252,9 @@ public class DetermineMovementActivity extends Activity {
                 unregisterPlotDataListener(_sensorListener);
                 _sensorManager.unregisterListener(_sensorListener);
                 _sensorListener.stop();
+            }
+            if (gravityEventListener != null) {
+                _sensorManager.unregisterListener(gravityEventListener);
             }
 
             setPlotCheckBoxEnabled(false);
