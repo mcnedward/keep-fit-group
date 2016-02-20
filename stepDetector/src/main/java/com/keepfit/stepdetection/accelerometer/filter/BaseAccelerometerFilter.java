@@ -1,4 +1,4 @@
-package com.keepfit.app.sensor.accelerometer;
+package com.keepfit.stepdetection.accelerometer.filter;
 
 
 public abstract class BaseAccelerometerFilter implements AccelerometerFilter {

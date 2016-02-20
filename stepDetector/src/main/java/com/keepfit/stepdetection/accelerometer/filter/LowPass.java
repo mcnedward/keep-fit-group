@@ -1,4 +1,4 @@
-package com.keepfit.app.sensor.accelerometer;
+package com.keepfit.stepdetection.accelerometer.filter;
 
 /*
     * time smoothing constant for low-pass filter

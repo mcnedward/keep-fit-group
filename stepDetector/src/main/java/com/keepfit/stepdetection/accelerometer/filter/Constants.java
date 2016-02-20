@@ -1,4 +1,4 @@
-package com.keepfit.app.sensor.accelerometer;
+package com.keepfit.stepdetection.accelerometer.filter;
 
 public class Constants {
     public static final float HIGH_PASS_ALPHA = 0.8f;
