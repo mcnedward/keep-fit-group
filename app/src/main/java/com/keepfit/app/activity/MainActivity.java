@@ -3,8 +3,10 @@ package com.keepfit.app.activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -14,9 +16,14 @@ import com.keepfit.app.activity.fragment.PreferenceFrag;
 import com.keepfit.app.R;
 import com.keepfit.app.utils.StepDetectAlgorithm;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.prefs.Preferences;
 
 public class MainActivity extends AppCompatActivity {
+    private static final String TAG = "MainActivity";
 
     private SharedPreferences _preferences;
     private StepDetectAlgorithm _stepAlgorithm = StepDetectAlgorithm.FREQ_INDEPENDENT;
@@ -36,9 +43,25 @@ public class MainActivity extends AppCompatActivity {
         _preferences = getPreferences(MODE_PRIVATE);
 
         initControls();
+
+        loadFile();
     }
 
     private void initControls() {
+    }
+
+    private void loadFile() {
+        InputStream iS = null;
+        try {
+            iS = getResources().getAssets().open("accelerometer_highPassFilter.csv");
+            BufferedReader reader = new BufferedReader(new InputStreamReader(iS));
+            String line;
+            while ((line = reader.readLine()) != null) {
+                Log.d(TAG, line);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
