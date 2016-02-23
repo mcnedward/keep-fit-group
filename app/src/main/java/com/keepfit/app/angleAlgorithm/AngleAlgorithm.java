@@ -2,12 +2,15 @@ package com.keepfit.app.angleAlgorithm;
 
 import android.util.Log;
 
+import com.keepfit.stepdetection.algorithms.AccelerationData;
+import com.keepfit.stepdetection.algorithms.BaseAlgorithm;
+
 import java.sql.Timestamp;
 
 /**
  * Created by Edward on 2/19/2016.
  */
-public class AngleAlgorithm {
+public class AngleAlgorithm extends BaseAlgorithm {
     private final static String TAG = "AngleAlgorithm";
 
     private final static double SENSOR_VALUE = 9.8;
@@ -27,6 +30,11 @@ public class AngleAlgorithm {
         xValues = new float[3];
         yValues = new float[3];
         zValues = new float[3];
+    }
+
+    @Override
+    protected void notifySensorDataRecieved(AccelerationData ad) {
+
     }
 
     public void notifyAccelerometerSensorChanged(long eventTime, float xAcceleration, float yAcceleration, float zAcceleration, double acceleration) {
