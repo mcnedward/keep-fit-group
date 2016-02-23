@@ -1,33 +1,39 @@
 package com.keepfit.stepdetection.algorithms;
 
+import com.keepfit.stepdetection.accelerometer.filter.Util;
+
 public class AccelerationData {
 
-    private final float x;
-    private final float y;
-    private final float z;
+    private final double x;
+    private final double y;
+    private final double z;
     private final long timeStamp;
 
     public AccelerationData(float x, float y, float z, long timeStamp) {
-        this.x = x;
-        this.y = y;
-        this.z = z;
+        this.x = (double) x;
+        this.y = (double)y;
+        this.z = (double)z;
         this.timeStamp = timeStamp;
     }
 
-    private float getX() {
+    public double getX() {
         return x;
     }
 
-    private float getY() {
+    public double getY() {
         return y;
     }
 
-    private float getZ() {
+    public double getZ() {
         return z;
     }
 
-    private long getTimeStamp() {
+    public long getTimeStamp() {
         return timeStamp;
+    }
+
+    public double getXYZMagnitude(){
+        return Util.magnitude(new double[]{x, y, z});
     }
 
 }
