@@ -1,8 +1,10 @@
-package com.keepfit.app;
+package com.keepfit.app.activity.fragment;
 
 
 import android.os.Bundle;
 import android.preference.PreferenceFragment;
+
+import com.keepfit.app.R;
 
 public class PreferenceFrag extends PreferenceFragment
 {

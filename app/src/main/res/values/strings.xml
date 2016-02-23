@@ -4,6 +4,8 @@
     <string name="stepCountModeLabel">Count Steps</string>
     <string name="app_name">Step Counter</string>
     <string name="action_settings">Settings</string>
+    <string name="action_supported_sensors">Sensors</string>
+    <string name="supported_sensors">Sensors Supported On This Device</string>
     <string name="movementDetectedText">Movement Detected</string>
     <string name="selectSensorSectionHeading">Select Sensor</string>
     <string name="accelerometerLabel">Accelerometer</string>

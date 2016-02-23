@@ -14,7 +14,7 @@ public class StepDetector implements IStepDetector {
     private List<BaseAlgorithm> algorithms;
 
     protected StepDetector() {
-        algorithms = new ArrayList<>();sta
+        algorithms = new ArrayList<>();
     }
 
     @Override

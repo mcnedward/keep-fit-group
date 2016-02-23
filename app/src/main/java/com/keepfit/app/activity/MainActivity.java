@@ -1,4 +1,4 @@
-package com.keepfit.app;
+package com.keepfit.app.activity;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -10,9 +10,11 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.WindowManager;
 
-import java.util.prefs.Preferences;
+import com.keepfit.app.activity.fragment.PreferenceFrag;
+import com.keepfit.app.R;
+import com.keepfit.app.utils.StepDetectAlgorithm;
 
-enum StepDetectAlgorithm {FREQ_INDEPENDENT};
+import java.util.prefs.Preferences;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -28,10 +30,9 @@ public class MainActivity extends AppCompatActivity {
         Toolbar myToolbar = (Toolbar) findViewById(R.id.my_toolbar);
         setSupportActionBar(myToolbar);
 
-
         //_readingAccelerationData = false;
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-       // _sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
+        // _sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
         _preferences = getPreferences(MODE_PRIVATE);
 
         initControls();
@@ -41,26 +42,26 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu)
-    {
+    public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.menu, menu);
+        inflater.inflate(R.menu.menu_main, menu);
         return true;
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item)
-    {
-        switch(item.getItemId())
-        {
-            case R.id.settings:
-            {
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.settings: {
                 Intent intent = new Intent(this, Preferences.class);
-                intent.putExtra( MyPreferenceActivity.EXTRA_SHOW_FRAGMENT, PreferenceFrag.class.getName() );
-                intent.putExtra( MyPreferenceActivity.EXTRA_NO_HEADERS, true );
-                intent.setClassName(this, "com.keepfit.app.MyPreferenceActivity");
+                intent.putExtra(MyPreferenceActivity.EXTRA_SHOW_FRAGMENT, PreferenceFrag.class.getName());
+                intent.putExtra(MyPreferenceActivity.EXTRA_NO_HEADERS, true);
+                intent.setClassName(this, "com.keepfit.app.activity.MyPreferenceActivity");
                 startActivity(intent);
                 return true;
+            }
+            case R.id.action_supported_sensors: {
+                Intent intent = new Intent(this, SupportedSensorsActivity.class);
+                startActivity(intent);
             }
         }
 

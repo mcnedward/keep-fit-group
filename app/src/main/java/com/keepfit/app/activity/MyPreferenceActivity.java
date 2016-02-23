@@ -1,6 +1,9 @@
-package com.keepfit.app;
+package com.keepfit.app.activity;
 
 import android.preference.PreferenceActivity;
+
+import com.keepfit.app.activity.fragment.PreferenceFrag;
+import com.keepfit.app.R;
 
 import java.util.List;
 

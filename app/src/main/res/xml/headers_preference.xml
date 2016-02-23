@@ -4,7 +4,7 @@
     xmlns:android="http://schemas.android.com/apk/res/android">
 
     <header
-        android:fragment="com.keepfit.app.PreferenceFrag"
+        android:fragment="com.keepfit.app.activity.fragment.PreferenceFrag"
         android:title="Goto: Preference fragment"
         android:summary="An example of some preferences." />
 
