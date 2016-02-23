@@ -14,19 +14,19 @@ public class AccelerationData {
         this.timeStamp = timeStamp;
     }
 
-    private float getX() {
+    public float getX() {
         return x;
     }
 
-    private float getY() {
+    public float getY() {
         return y;
     }
 
-    private float getZ() {
+    public float getZ() {
         return z;
     }
 
-    private long getTimeStamp() {
+    public long getTimeStamp() {
         return timeStamp;
     }
 
