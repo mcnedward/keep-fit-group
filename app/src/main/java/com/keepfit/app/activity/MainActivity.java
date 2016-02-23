@@ -1,5 +1,6 @@
 package com.keepfit.app.activity;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -12,6 +13,15 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.WindowManager;
 
+import com.keepfit.stepdetection.algorithms.AccelerationData;
+
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.List;
 import com.keepfit.app.activity.fragment.PreferenceFrag;
 import com.keepfit.app.R;
 import com.keepfit.app.utils.StepDetectAlgorithm;
@@ -43,7 +53,6 @@ public class MainActivity extends AppCompatActivity {
         _preferences = getPreferences(MODE_PRIVATE);
 
         initControls();
-
         loadFile();
     }
 
@@ -51,13 +60,16 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void loadFile() {
+        List<AccelerationData> accelerationDataList = new ArrayList<>();
         InputStream iS = null;
         try {
             iS = getResources().getAssets().open("accelerometer_highPassFilter.csv");
             BufferedReader reader = new BufferedReader(new InputStreamReader(iS));
             String line;
             while ((line = reader.readLine()) != null) {
-                Log.d(TAG, line);
+                String[] lineSplit = line.split(",");
+                AccelerationData accelerationData = new AccelerationData(Float.parseFloat(lineSplit[1]), Float.parseFloat(lineSplit[2]), Float.parseFloat(lineSplit[3]), Long.parseLong(lineSplit[0]));
+                accelerationDataList.add(accelerationData);
             }
         } catch (IOException e) {
             e.printStackTrace();
