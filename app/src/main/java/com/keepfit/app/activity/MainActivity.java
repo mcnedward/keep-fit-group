@@ -25,6 +25,7 @@ import java.util.List;
 import com.keepfit.app.activity.fragment.PreferenceFrag;
 import com.keepfit.app.R;
 import com.keepfit.app.utils.StepDetectAlgorithm;
+import com.keepfit.stepdetection.algorithms.StepDetector;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -35,10 +36,7 @@ import java.util.prefs.Preferences;
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
 
-    private SharedPreferences _preferences;
-    private StepDetectAlgorithm _stepAlgorithm = StepDetectAlgorithm.FREQ_INDEPENDENT;
-    private boolean _recordSensorData = false;
-    private String _dataFile = null;
+    private StepDetector stepDetector;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,7 +48,8 @@ public class MainActivity extends AppCompatActivity {
         //_readingAccelerationData = false;
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         // _sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
-        _preferences = getPreferences(MODE_PRIVATE);
+
+        stepDetector = new StepDetector();
 
         initControls();
         loadFile();

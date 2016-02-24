@@ -1,5 +1,7 @@
 package com.keepfit.stepdetection.algorithms.kornel;
 
+import android.content.Context;
+
 import com.keepfit.stepdetection.algorithms.AccelerationData;
 import com.keepfit.stepdetection.algorithms.BaseAlgorithm;
 
@@ -8,8 +10,11 @@ import java.util.List;
 /**
  * Created by kornelkotan on 23/02/2016.
  */
-public class KornelAlgorithm implements BaseAlgorithm {
+public class KornelAlgorithm extends BaseAlgorithm {
 
+    public KornelAlgorithm(Context context) {
+        super(context);
+    }
 
     @Override
     public void notifySensorDataRecieved(AccelerationData ad) {

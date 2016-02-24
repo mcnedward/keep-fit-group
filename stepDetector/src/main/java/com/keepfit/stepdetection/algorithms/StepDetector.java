@@ -6,12 +6,11 @@ import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Vector;
 
 public class StepDetector implements IStepDetector {
     private final static String TAG = "StepDetector";
 
-    private List<BaseAlgorithm> algorithms;
+    private List<IAlgorithm> algorithms;
 
     protected StepDetector() {
         algorithms = new ArrayList<>();
@@ -31,25 +30,25 @@ public class StepDetector implements IStepDetector {
     }
 
     @Override
-     public void addAccelerationData(AccelerationData ad) {
+    public void addAccelerationData(AccelerationData ad) {
         notifyAlgorithms(ad);
     }
 
     private void notifyAlgorithms(AccelerationData ad) {
-        for (BaseAlgorithm algorithm : algorithms) {
+        for (IAlgorithm algorithm : algorithms) {
             algorithm.notifySensorDataRecieved(ad);
         }
     }
 
     @Override
-    public synchronized void registerAlgorithm(BaseAlgorithm algorithm) {
+    public synchronized void registerAlgorithm(IAlgorithm algorithm) {
         if (algorithm != null && !algorithms.contains(algorithm)) {
             algorithms.add(algorithm);
         }
     }
 
     @Override
-    public synchronized void unregisterAlgorithm(BaseAlgorithm algorithm) {
+    public synchronized void unregisterAlgorithm(IAlgorithm algorithm) {
         if (algorithms.contains(algorithm)) {
             algorithms.remove(algorithm);
         }
