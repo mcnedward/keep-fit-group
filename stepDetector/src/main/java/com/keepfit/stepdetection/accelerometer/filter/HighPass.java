@@ -2,11 +2,11 @@ package com.keepfit.stepdetection.accelerometer.filter;
 
 public class HighPass extends BaseAccelerometerFilter {
 
-    private final float[] _gravity;
+    private final double[] _gravity;
 
     public HighPass(float alpha) {
         super(alpha);
-        _gravity = new float[VECTOR_SIZE];
+        _gravity = new double[VECTOR_SIZE];
     }
 
     /**
@@ -15,8 +15,8 @@ public class HighPass extends BaseAccelerometerFilter {
      *
      * @see "http://developer.android.com/reference/android/hardware/SensorEvent.html"
      */
-    public float[] filter(float x, float y, float z) {
-        float[] filteredValues = new float[VECTOR_SIZE];
+    public double[] filter(double x, double y, double z) {
+        double[] filteredValues = new double[VECTOR_SIZE];
 
         _gravity[X] = getAlpha() * _gravity[X] + (1 - getAlpha()) * x;
         _gravity[Y] = getAlpha() * _gravity[Y] + (1 - getAlpha()) * y;

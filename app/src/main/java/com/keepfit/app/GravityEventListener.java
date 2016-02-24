@@ -5,7 +5,7 @@ import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.util.Log;
 
-import com.keepfit.app.angleAlgorithm.AngleAlgorithm;
+import com.keepfit.stepdetection.algorithms.edward.AngleAlgorithm;
 
 /**
  * Created by Edward on 2/19/2016.

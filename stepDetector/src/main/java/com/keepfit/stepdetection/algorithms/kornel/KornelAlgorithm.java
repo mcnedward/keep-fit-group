@@ -17,18 +17,22 @@ public class KornelAlgorithm extends BaseAlgorithm {
     }
 
     @Override
-    public void notifySensorDataRecieved(AccelerationData ad) {
+    public void notifySensorDataReceived(AccelerationData ad) {
         throw new UnsupportedOperationException("Not implemented");
     }
 
     @Override
-    public void notifySensorDataRecieved(List<AccelerationData> adList) {
+    public void notifySensorDataReceived(List<AccelerationData> adList) {
         double threshold;
         int stepsCounted;
 
         threshold = calculateThreshold(adList);
         stepsCounted = calculateStepcount(adList,threshold);
+    }
 
+    @Override
+    public void handleSensorData(AccelerationData ad) {
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     private double calculateThreshold(List<AccelerationData> adList) {

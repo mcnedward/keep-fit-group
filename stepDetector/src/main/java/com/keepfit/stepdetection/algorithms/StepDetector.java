@@ -1,7 +1,9 @@
 package com.keepfit.stepdetection.algorithms;
 
+import android.content.Context;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
+import android.hardware.SensorManager;
 import android.util.Log;
 
 import java.util.ArrayList;
@@ -10,9 +12,11 @@ import java.util.List;
 public class StepDetector implements IStepDetector {
     private final static String TAG = "StepDetector";
 
+    private SensorManager sensorManager;
     private List<IAlgorithm> algorithms;
 
-    protected StepDetector() {
+    public StepDetector(Context context) {
+        sensorManager = (SensorManager) context.getSystemService(Context.SENSOR_SERVICE);
         algorithms = new ArrayList<>();
     }
 
@@ -36,7 +40,7 @@ public class StepDetector implements IStepDetector {
 
     private void notifyAlgorithms(AccelerationData ad) {
         for (IAlgorithm algorithm : algorithms) {
-            algorithm.notifySensorDataRecieved(ad);
+            algorithm.notifySensorDataReceived(ad);
         }
     }
 
@@ -52,6 +56,11 @@ public class StepDetector implements IStepDetector {
         if (algorithms.contains(algorithm)) {
             algorithms.remove(algorithm);
         }
+    }
+
+    @Override
+    public List<IAlgorithm> getAlgorithms() {
+        return algorithms;
     }
 
     @Override

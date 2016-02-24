@@ -13,6 +13,8 @@ import java.io.PrintWriter;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.List;
+import java.util.Random;
 
 /**
  * Created by Edward on 2/24/2016.
@@ -26,22 +28,44 @@ public abstract class BaseAlgorithm implements IAlgorithm {
     private PrintWriter printWriter;
     private File dataFile;
     private long startTime;
+    private boolean runAlgorithm;   // Boolean to determine whether the algorithm should be run, or if only data should be gathered.
 
     public BaseAlgorithm(Context context) {
         this.context = context;
         startTime = System.currentTimeMillis();
+        runAlgorithm = true;
+
         DateFormat df = new SimpleDateFormat("EEE_d_MMM_ yyyy_HHmm");
         String date = df.format(Calendar.getInstance().getTime());
-        dataFile = new File(String.format("AlgorithmData_%s.csv", date));
+        dataFile = new File(context.getExternalCacheDir() + String.format("AlgorithmData_%s_%s.csv", date, new Random().nextInt(10)));
         try {
+            dataFile.createNewFile();
             printWriter = new PrintWriter(new BufferedWriter(new FileWriter(dataFile)));
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    protected void writeSensorData(long eventTime, float x, float y, float z, double acceleration) {
+    @Override
+    public void notifySensorDataReceived(AccelerationData ad) {
+        double acceleration = ad.getAcceleration();
+        writeSensorData(ad.getTimeStamp(), ad.getX(), ad.getY(), ad.getZ(), acceleration);
+        if (runAlgorithm)
+            handleSensorData(ad);
+    }
+
+    @Override
+    public void notifySensorDataReceived(List<AccelerationData> adList) {
+        for (AccelerationData ad : adList) {
+            notifySensorDataReceived(ad);
+        }
+    }
+
+    protected abstract void handleSensorData(AccelerationData ad);
+
+    protected void writeSensorData(long eventTime, double x, double y, double z, double acceleration) {
         if (printWriter != null) {
+            Log.d(TAG, "Writing " + acceleration);
             printWriter.println(String.valueOf((eventTime / MILLISEC_FACTOR) - startTime)
                     + CSV_DELIM + x
                     + CSV_DELIM + y
@@ -53,16 +77,13 @@ public abstract class BaseAlgorithm implements IAlgorithm {
         }
     }
 
-    public void emailDataFile() {
-        if (printWriter != null) {
-            printWriter.close();
-        }
-        Uri uri = Uri.fromFile(dataFile);
-        Intent intent = new Intent(Intent.ACTION_SEND);
-        intent.setType("plain/text");
-        intent.putExtra(Intent.EXTRA_EMAIL, new String[]{"edwardmcn64@gmail.com"});
-        intent.putExtra(Intent.EXTRA_SUBJECT, "Step Detector");
-        intent.putExtra(Intent.EXTRA_STREAM, uri);
-        context.startActivity(Intent.createChooser(intent, "Sending email..."));
+    @Override
+    public File getDataFile() {
+        return dataFile;
+    }
+
+    @Override
+    public void shouldRunAlgorithm(boolean runAlgorithm) {
+        this.runAlgorithm = runAlgorithm;
     }
 }

@@ -1,5 +1,6 @@
 package com.keepfit.stepdetection.algorithms;
 
+import java.io.File;
 import java.util.List;
 
 /**
@@ -7,7 +8,11 @@ import java.util.List;
  */
 public interface IAlgorithm {
 
-    public void notifySensorDataRecieved(AccelerationData ad);
+    void notifySensorDataReceived(AccelerationData ad);
 
-    public void notifySensorDataRecieved(List<AccelerationData> adList);
+    void notifySensorDataReceived(List<AccelerationData> adList);
+
+    File getDataFile();
+
+    void shouldRunAlgorithm(boolean runAlgorithm);
 }

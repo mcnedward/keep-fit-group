@@ -1,6 +1,6 @@
 package com.keepfit.app;
 
-import com.keepfit.app.angleAlgorithm.AngleAlgorithm;
+import com.keepfit.stepdetection.algorithms.edward.AngleAlgorithm;
 
 import org.junit.Test;
 

@@ -7,15 +7,15 @@ package com.keepfit.stepdetection.accelerometer.filter;
     */
 public class LowPass extends BaseAccelerometerFilter {
 
-    private float[] _cachedValues;
+    private double[] _cachedValues;
 
     public LowPass(float alpha) {
         super(alpha);
-        _cachedValues = new float[VECTOR_SIZE];
+        _cachedValues = new double[VECTOR_SIZE];
     }
 
     @Override
-    public float[] filter(float x, float y, float z) {
+    public double[] filter(double x, double y, double z) {
         _cachedValues[X] = _cachedValues[X] + getAlpha() * (x - _cachedValues[X]);
         _cachedValues[Y] = _cachedValues[Y] + getAlpha() * (y - _cachedValues[Y]);
         _cachedValues[Z] = _cachedValues[Z] + getAlpha() * (z - _cachedValues[Z]);

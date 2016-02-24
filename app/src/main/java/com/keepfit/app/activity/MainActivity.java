@@ -1,42 +1,31 @@
 package com.keepfit.app.activity;
 
-import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.WindowManager;
 
-import com.keepfit.stepdetection.algorithms.AccelerationData;
-
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.List;
-import com.keepfit.app.activity.fragment.PreferenceFrag;
 import com.keepfit.app.R;
-import com.keepfit.app.utils.StepDetectAlgorithm;
-import com.keepfit.stepdetection.algorithms.StepDetector;
+import com.keepfit.app.activity.fragment.PreferenceFrag;
+import com.keepfit.stepdetection.algorithms.AccelerationData;
+import com.keepfit.stepdetection.algorithms.IStepDetector;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.prefs.Preferences;
 
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
 
-    private StepDetector stepDetector;
+    private IStepDetector stepDetector;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,8 +37,6 @@ public class MainActivity extends AppCompatActivity {
         //_readingAccelerationData = false;
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         // _sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
-
-        stepDetector = new StepDetector();
 
         initControls();
         loadFile();
@@ -65,9 +52,14 @@ public class MainActivity extends AppCompatActivity {
             iS = getResources().getAssets().open("accelerometer_highPassFilter.csv");
             BufferedReader reader = new BufferedReader(new InputStreamReader(iS));
             String line;
+            boolean first = true;
             while ((line = reader.readLine()) != null) {
+                if (first) {
+                    first = false;
+                    continue;
+                }
                 String[] lineSplit = line.split(",");
-                AccelerationData accelerationData = new AccelerationData(Float.parseFloat(lineSplit[1]), Float.parseFloat(lineSplit[2]), Float.parseFloat(lineSplit[3]), Long.parseLong(lineSplit[0]));
+                AccelerationData accelerationData = new AccelerationData(Double.parseDouble(lineSplit[0]), Double.parseDouble(lineSplit[1]), Double.parseDouble(lineSplit[2]), Double.parseDouble(lineSplit[3]), Long.parseLong(lineSplit[4]));
                 accelerationDataList.add(accelerationData);
             }
         } catch (IOException e) {

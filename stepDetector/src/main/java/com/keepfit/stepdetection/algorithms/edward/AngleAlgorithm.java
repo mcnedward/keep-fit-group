@@ -1,11 +1,13 @@
-package com.keepfit.app.angleAlgorithm;
+package com.keepfit.stepdetection.algorithms.edward;
 
+import android.content.Context;
 import android.util.Log;
 
 import com.keepfit.stepdetection.algorithms.AccelerationData;
 import com.keepfit.stepdetection.algorithms.BaseAlgorithm;
 
 import java.sql.Timestamp;
+import java.util.List;
 
 /**
  * Created by Edward on 2/19/2016.
@@ -18,26 +20,27 @@ public class AngleAlgorithm extends BaseAlgorithm {
 
     private int numberOfSteps;
 
-    private float[] xValues;
-    private float[] yValues;
-    private float[] zValues;
+    private double[] xValues;
+    private double[] yValues;
+    private double[] zValues;
     private int index = 0;
-    private float xAcceleration, yAcceleration, zAcceleration;
+    private double xAcceleration, yAcceleration, zAcceleration;
     private float timer = 0f;
     private boolean startTimer = false;
 
-    public AngleAlgorithm() {
-        xValues = new float[3];
-        yValues = new float[3];
-        zValues = new float[3];
+    public AngleAlgorithm(Context context) {
+        super(context);
+        xValues = new double[3];
+        yValues = new double[3];
+        zValues = new double[3];
     }
 
     @Override
-    protected void notifySensorDataRecieved(AccelerationData ad) {
-
+    public void handleSensorData(AccelerationData ad) {
+        notifyAccelerometerSensorChanged(ad.getTimeStamp(), ad.getX(), ad.getY(), ad.getZ(), ad.getXYZMagnitude());
     }
 
-    public void notifyAccelerometerSensorChanged(long eventTime, float xAcceleration, float yAcceleration, float zAcceleration, double acceleration) {
+    public void notifyAccelerometerSensorChanged(long eventTime, double xAcceleration, double yAcceleration, double zAcceleration, double acceleration) {
         Log.d(TAG, String.format("Sensor change at: %s; X: %s; Y: %s; Z: %s; Acceleration: %s", eventTime, xAcceleration, yAcceleration, zAcceleration, acceleration));
         xValues[index] = xAcceleration;
         yValues[index] = yAcceleration;
@@ -50,22 +53,22 @@ public class AngleAlgorithm extends BaseAlgorithm {
         this.zAcceleration = calculate3PointAverage(zValues);
     }
 
-    private float calculate3PointAverage(float[] values) {
-        float average = 0f;
+    private double calculate3PointAverage(double[] values) {
+        double average = 0f;
         if (values.length == 1)
             return average;
 
-        float v1 = values[0];
-        float v2 = values[1];
+        double v1 = values[0];
+        double v2 = values[1];
 
         if (values.length == 2) {
             // Calculate 2 point average
-            float a = (2 * v1) + (v2 * 2);
+            double a = (2 * v1) + (v2 * 2);
             average = a / 3;
         } else {
             // Calculate 3 point average
-            float v3 = values[2];
-            float a = v1 + v2 + v3;
+            double v3 = values[2];
+            double a = v1 + v2 + v3;
             average = a / 3;
         }
         shuffleValues(values);
@@ -104,20 +107,20 @@ public class AngleAlgorithm extends BaseAlgorithm {
         }
     }
 
-    private double getGravityDirectionAccelerationForAxis(float gravityComponent, float acceleration) {
+    private double getGravityDirectionAccelerationForAxis(double gravityComponent, double acceleration) {
         double currentAngle = calculateInclinationAngle(gravityComponent);
         return Math.abs(calculateGravityDirectionAcceleration(acceleration, currentAngle));
     }
 
-    private double calculateInclinationAngle(float gravityComponent) {
+    private double calculateInclinationAngle(double gravityComponent) {
         return Math.asin(gravityComponent / SENSOR_VALUE);
     }
 
-    private double calculateGravityDirectionAcceleration(float acceleration, double inclinationAngle) {
+    private double calculateGravityDirectionAcceleration(double acceleration, double inclinationAngle) {
         return acceleration * Math.sin(inclinationAngle);
     }
 
-    private void shuffleValues(float[] values) {
+    private void shuffleValues(double[] values) {
         for (int i = 0; i < values.length - 1; i++) {
             values[i] = values[i + 1];
         }

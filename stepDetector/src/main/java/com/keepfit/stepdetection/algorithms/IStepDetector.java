@@ -9,5 +9,6 @@ public interface IStepDetector extends SensorEventListener {
     void addAccelerationData(List<AccelerationData> data);
     void registerAlgorithm(IAlgorithm algorithm);
     void unregisterAlgorithm(IAlgorithm algorithm);
+    List<IAlgorithm> getAlgorithms();
     void reset();
 }
