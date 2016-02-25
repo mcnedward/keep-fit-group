@@ -1,12 +1,14 @@
-package com.keepfit.app.activity;
+package com.keepfit.app.activity.fragment;
 
-import android.app.Activity;
+import android.content.Context;
 import android.hardware.Sensor;
 import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
 import android.view.KeyEvent;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
@@ -27,39 +29,51 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by Edward on 2/23/2016.
+ * Created by Edward on 2/25/2016.
  */
-public class SupportedSensorsActivity extends Activity {
+public class SensorFragment extends BaseFragment {
 
+    private Context context;
+    private View view;
     private SensorManager sensorManager;
     private static final int RATE = 10000;
     private List<Holder> holders;
     private static final String FROM_EMAIL = "edwardmcn64@gmail.com";
     private List<String> toEmails;
-
     private EditText editEmail;
     private LinearLayout emailsLayout;
     private Button btnSendEmail;
     private List<View> emailViews;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_supported_sensors);
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        view = inflater.inflate(R.layout.fragment_sensors, container, false);
+        initialize();
+        return view;
+    }
+
+    private void initialize() {
+        context = view.getContext();
+        holders = new ArrayList<>();
+        sensorManager = (SensorManager) context.getSystemService(context.SENSOR_SERVICE);
         toEmails = new ArrayList<>();
         emailViews = new ArrayList<>();
         initializeAlgorithmHolders();
-        initialize();
+        initializeSensors();
         initializeView();
+        setUserVisibleHint(false);
     }
 
     @Override
-    public void onPause() {
-        for (Holder holder : holders) {
-            IStepDetector stepDetector = holder.stepDetector;
-            stepDetector.reset();
+    public void setUserVisibleHint(boolean isVisibleToUser) {
+        super.setUserVisibleHint(isVisibleToUser);
+        if (!isVisibleToUser) {
+            stop();
+        } else {
+            if (holders == null || holders.isEmpty())
+                initializeAlgorithmHolders();
+            initializeSensors();
         }
-        super.onPause();
     }
 
     public void emailDataFiles() {
@@ -72,26 +86,26 @@ public class SupportedSensorsActivity extends Activity {
                 }
             }
         }
-        Extension.emailDataFile(this, dataFiles, toEmails.toArray(new String[toEmails.size()]));
+        Extension.emailDataFile(context, dataFiles, toEmails.toArray(new String[toEmails.size()]));
     }
 
     private void initializeAlgorithmHolders() {
         holders = new ArrayList<>();
 
-        IStepDetector detector1 = new StepDetector(this);
-        detector1.registerAlgorithm(new DataGatherAlgorithm(this, "Accelerometer"));
+        IStepDetector detector1 = new StepDetector(context);
+        detector1.registerAlgorithm(new DataGatherAlgorithm(context, "Accelerometer"));
         Holder holder1 = new Holder(detector1, Sensor.TYPE_ACCELEROMETER);
 
-        IStepDetector detector2 = new StepDetector(this);
-        detector2.registerAlgorithm(new DataGatherAlgorithm(this, "Linear Accelerometer"));
+        IStepDetector detector2 = new StepDetector(context);
+        detector2.registerAlgorithm(new DataGatherAlgorithm(context, "Linear Accelerometer"));
         Holder holder2 = new Holder(detector2, Sensor.TYPE_LINEAR_ACCELERATION);
 
-        IStepDetector detector3 = new StepDetector(this);
-        detector3.registerAlgorithm(new DataGatherAlgorithm(this, "Gravity"));
+        IStepDetector detector3 = new StepDetector(context);
+        detector3.registerAlgorithm(new DataGatherAlgorithm(context, "Gravity"));
         Holder holder3 = new Holder(detector3, Sensor.TYPE_GRAVITY);
 
-        IStepDetector detector4 = new StepDetector(this);
-        detector4.registerAlgorithm(new DataGatherAlgorithm(this, "Gyroscope"));
+        IStepDetector detector4 = new StepDetector(context);
+        detector4.registerAlgorithm(new DataGatherAlgorithm(context, "Gyroscope"));
         Holder holder4 = new Holder(detector4, Sensor.TYPE_GYROSCOPE);
 
         holders.add(holder1);
@@ -100,9 +114,8 @@ public class SupportedSensorsActivity extends Activity {
         holders.add(holder4);
     }
 
-    private void initialize() {
+    private void initializeSensors() {
         List<String> supportedSensors = new ArrayList<>();
-        sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
 
         for (Holder holder : holders) {
             holder.hasSensor = sensorManager.registerListener(holder.stepDetector, sensorManager.getDefaultSensor(holder.sensorType), RATE);
@@ -122,12 +135,12 @@ public class SupportedSensorsActivity extends Activity {
             }
         }
 
-        ListAdapter adapter = new SimpleStringAdapter(supportedSensors, this);
-        ((ListView) findViewById(R.id.sensors)).setAdapter(adapter);
+        ListAdapter adapter = new SimpleStringAdapter(supportedSensors, context);
+        ((ListView) view.findViewById(R.id.sensors)).setAdapter(adapter);
     }
 
     private void initializeView() {
-        btnSendEmail = (Button) findViewById(R.id.btn_send_email);
+        btnSendEmail = (Button) view.findViewById(R.id.btn_send_email);
         btnSendEmail.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -135,11 +148,11 @@ public class SupportedSensorsActivity extends Activity {
             }
         });
 
-        emailsLayout = (LinearLayout) findViewById(R.id.emails);
+        emailsLayout = (LinearLayout) view.findViewById(R.id.emails);
 
         addEmailTextView(FROM_EMAIL);
 
-        editEmail = (EditText) findViewById(R.id.edit_email);
+        editEmail = (EditText) view.findViewById(R.id.edit_email);
         editEmail.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
@@ -151,10 +164,10 @@ public class SupportedSensorsActivity extends Activity {
     }
 
     private void addEmailTextView(String email) {
-        final TextView emailView = new TextView(getApplicationContext());
+        final TextView emailView = new TextView(context);
         emailView.setText(email);
-        emailView.setPadding(24, 0, 0, 0);
-        emailView.setTextColor(ContextCompat.getColor(getApplicationContext(), R.color.Black));
+        emailView.setPadding(24, 10, 10, 0);
+        emailView.setTextColor(ContextCompat.getColor(context, R.color.Black));
         emailsLayout.addView(emailView);
         emailViews.add(emailView);
         btnSendEmail.setEnabled(true);
@@ -176,6 +189,16 @@ public class SupportedSensorsActivity extends Activity {
                 return true;
             }
         });
+    }
+
+    private void stop() {
+        if (holders != null)
+            for (Holder holder : holders) {
+                sensorManager.unregisterListener(holder.stepDetector);
+                sensorManager.flush(holder.stepDetector);
+                holder.stepDetector.reset();
+            }
+        holders = null;
     }
 
 }

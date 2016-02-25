@@ -65,7 +65,6 @@ public abstract class BaseAlgorithm implements IAlgorithm {
 
     protected void writeSensorData(long eventTime, double x, double y, double z, double acceleration) {
         if (printWriter != null) {
-            Log.d(TAG, "Writing " + acceleration);
             printWriter.println(String.valueOf((eventTime / MILLISEC_FACTOR) - startTime)
                     + CSV_DELIM + x
                     + CSV_DELIM + y

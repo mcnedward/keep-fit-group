@@ -15,4 +15,7 @@ public interface IAlgorithm {
     File getDataFile();
 
     void shouldRunAlgorithm(boolean runAlgorithm);
+
+    int getStepCount();
+
 }

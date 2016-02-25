@@ -20,4 +20,9 @@ public class DataGatherAlgorithm extends BaseAlgorithm {
     protected void handleSensorData(AccelerationData ad) {
         Log.i(TAG, "Gathering data for " + dataType);
     }
+
+    @Override
+    public int getStepCount() {
+        return 0;
+    }
 }

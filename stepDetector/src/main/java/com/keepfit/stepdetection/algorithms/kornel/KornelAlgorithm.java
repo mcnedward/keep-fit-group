@@ -12,6 +12,8 @@ import java.util.List;
  */
 public class KornelAlgorithm extends BaseAlgorithm {
 
+    private int stepsCounted;
+
     public KornelAlgorithm(Context context) {
         super(context);
     }
@@ -24,8 +26,6 @@ public class KornelAlgorithm extends BaseAlgorithm {
     @Override
     public void notifySensorDataReceived(List<AccelerationData> adList) {
         double threshold;
-        int stepsCounted;
-
         threshold = calculateThreshold(adList);
         stepsCounted = calculateStepcount(adList,threshold);
     }
@@ -75,5 +75,9 @@ public class KornelAlgorithm extends BaseAlgorithm {
         return stepCount;
     }
 
+    @Override
+    public int getStepCount() {
+        return stepsCounted;
+    }
 
 }
