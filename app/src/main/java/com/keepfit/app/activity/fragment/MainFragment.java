@@ -17,6 +17,7 @@ import com.keepfit.app.view.AlgorithmView;
 import com.keepfit.stepdetection.algorithms.AccelerationData;
 import com.keepfit.stepdetection.algorithms.IStepDetector;
 import com.keepfit.stepdetection.algorithms.StepDetector;
+import com.keepfit.stepdetection.algorithms.dino.DinoAlgorithm;
 import com.keepfit.stepdetection.algorithms.edward.AngleAlgorithm;
 import com.keepfit.stepdetection.algorithms.edward.EdwardAlgorithm;
 import com.keepfit.stepdetection.algorithms.kornel.KornelAlgorithm;
@@ -46,7 +47,7 @@ public class MainFragment extends BaseFragment {
     private AlgorithmView edwardAlgorithmView;
     private KornelAlgorithm kornelAlgorithm;
     private AlgorithmView kornelAlgorithmView;
-    // DINO ALGORITHM
+    private DinoAlgorithm dinoAlgorithm;
     private AlgorithmView dinoAlgorithmView;
 
     @Override
@@ -76,7 +77,7 @@ public class MainFragment extends BaseFragment {
     }
 
     private void initializeEdwardAlgorithm() {
-        edwardAlgorithm = new EdwardAlgorithm(context);
+        edwardAlgorithm = new EdwardAlgorithm();
         AngleAlgorithm algorithm = new AngleAlgorithm(context, edwardAlgorithm);
         stepDetector.registerAlgorithm(algorithm);
 
@@ -106,9 +107,23 @@ public class MainFragment extends BaseFragment {
     }
 
     private void initializeDinoAlgorithm() {
-        // dinoAlgorithm = new DinoAlgorithm(context);
-
-        // dinoAlgorithmView.setAlgorithm(dinoAlgorithm);
+        dinoAlgorithm = new DinoAlgorithm(context);
+        stepDetector.registerAlgorithm(dinoAlgorithm);
+        dinoAlgorithmView.setAlgorithm(dinoAlgorithm);
+        dinoAlgorithmView.setButtonOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (!runningAlgorithms) {
+                    runningAlgorithms = true;
+                    ((Button) v).setText(getResources().getString(R.string.stop));
+                    startDinoAlgorithm();
+                } else {
+                    runningAlgorithms = false;
+                    ((Button) v).setText(getResources().getString(R.string.start));
+                    stopAlgorithms();
+                }
+            }
+        });
     }
 
     private void startEdwardAlgorithm() {
@@ -123,7 +138,8 @@ public class MainFragment extends BaseFragment {
     }
 
     private void startDinoAlgorithm() {
-
+        sensorManager.registerListener(stepDetector, sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER), RATE);
+        displayAlgorithmData();
     }
 
     private List<AccelerationData> loadFile() {
@@ -168,6 +184,7 @@ public class MainFragment extends BaseFragment {
                         @Override
                         public void run() {
                             edwardAlgorithmView.update(edwardAlgorithm.getAccelerationData());
+                            dinoAlgorithmView.update(new AccelerationData(0, 0, 0, 0));
                         }
                     });
                 }
