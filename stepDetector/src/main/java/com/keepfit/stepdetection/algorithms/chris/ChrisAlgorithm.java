@@ -51,6 +51,7 @@ public class ChrisAlgorithm extends BaseAlgorithm {
 
     // Step data
     private int numSteps = 0;
+    private AccelerationData rawData;
     private List<FilterData> fData;
     private boolean pSlope;
     private boolean nSlope;
@@ -68,7 +69,7 @@ public class ChrisAlgorithm extends BaseAlgorithm {
     public ChrisAlgorithm(Context context)
     {
         super(context);
-        kalman = new ArrayList<Double[]>();
+        kalman = new ArrayList<>();
         fData = new ArrayList<>();
         // k=0
         Double [] k0 = new Double [] {Z0_POCKET, P0_POCKET};
@@ -85,6 +86,7 @@ public class ChrisAlgorithm extends BaseAlgorithm {
             return;
         }
 
+        rawData  = ad;
         Double [] kLast = kalman.get(kalman.size()-1);
 
         ///////// Time Update (Prediction) ///////////////
@@ -231,5 +233,10 @@ public class ChrisAlgorithm extends BaseAlgorithm {
 
     public int getStepCount(){
         return this.numSteps;
+    }
+
+    public AccelerationData getAccelerationData() {
+        return rawData;
+
     }
 }
