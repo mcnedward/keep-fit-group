@@ -18,4 +18,8 @@ public interface IAlgorithm {
 
     int getStepCount();
 
+    void createFile(String fileName);
+
+    AccelerationData getAccelerationData();
+
 }

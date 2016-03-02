@@ -13,23 +13,18 @@
         android:orientation="vertical">
 
         <com.keepfit.app.view.AlgorithmView
-            android:id="@+id/edward_algorithm"
-            custom:algorithmTitle="@string/edward_algorithm"
+            android:id="@+id/algorithm_view"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:paddingBottom="20dp"/>
 
-        <com.keepfit.app.view.AlgorithmView
-            android:id="@+id/kornel_algorithm"
-            custom:algorithmTitle="@string/kornel_algorithm"
+        <com.androidplot.xy.XYPlot
+            android:id="@+id/xy_plot"
+            title="Acceleration Plot"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
-
-        <com.keepfit.app.view.AlgorithmView
-            android:id="@+id/dino_algorithm"
-            custom:algorithmTitle="@string/dino_algorithm"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
-
+            android:layout_height="250dp"
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="5dp"/>
     </LinearLayout>
 
 

@@ -80,4 +80,9 @@ public class KornelAlgorithm extends BaseAlgorithm {
         return stepsCounted;
     }
 
+    @Override
+    public AccelerationData getAccelerationData() {
+        return new AccelerationData(0, 0, 0, 0);
+    }
+
 }

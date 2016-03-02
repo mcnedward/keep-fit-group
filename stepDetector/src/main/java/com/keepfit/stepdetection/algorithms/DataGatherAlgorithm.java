@@ -25,4 +25,9 @@ public class DataGatherAlgorithm extends BaseAlgorithm {
     public int getStepCount() {
         return 0;
     }
+
+    @Override
+    public AccelerationData getAccelerationData() {
+        return new AccelerationData(0, 0, 0, 0);
+    }
 }

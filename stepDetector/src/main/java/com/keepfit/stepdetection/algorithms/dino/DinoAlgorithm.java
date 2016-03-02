@@ -118,6 +118,10 @@ public class DinoAlgorithm extends BaseAlgorithm {
             }
             i = i + 1;
         }
+    }
 
+    @Override
+    public AccelerationData getAccelerationData() {
+        return new AccelerationData(0, 0, 0, 0);
     }
 }

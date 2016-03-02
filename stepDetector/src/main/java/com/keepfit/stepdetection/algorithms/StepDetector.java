@@ -6,6 +6,8 @@ import android.hardware.SensorEvent;
 import android.hardware.SensorManager;
 import android.util.Log;
 
+import com.keepfit.stepdetection.algorithms.edward.EdwardAlgorithm;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,6 +26,8 @@ public class StepDetector implements IStepDetector {
     public void onSensorChanged(SensorEvent event) {
         AccelerationData ad = new AccelerationData(event.values[0], event.values[1], event.values[2], event.timestamp);
         notifyAlgorithms(ad);
+        if (event.sensor.getType() == Sensor.TYPE_GRAVITY)
+            notifyAlgorithmsGravityChanged(ad);
     }
 
     @Override
@@ -41,6 +45,14 @@ public class StepDetector implements IStepDetector {
     private void notifyAlgorithms(AccelerationData ad) {
         for (IAlgorithm algorithm : algorithms) {
             algorithm.notifySensorDataReceived(ad);
+        }
+    }
+
+    private void notifyAlgorithmsGravityChanged(AccelerationData ad) {
+        for (IAlgorithm algorithm : algorithms) {
+            if (algorithm instanceof EdwardAlgorithm) {
+                ((EdwardAlgorithm)algorithm).handleGravitySensorData(ad);
+            }
         }
     }
 
