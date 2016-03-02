@@ -30,6 +30,12 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
 
+        <com.keepfit.app.view.AlgorithmView
+            android:id="@+id/chris_algorithm"
+            custom:algorithmTitle="@string/chris_algorithm"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
     </LinearLayout>
 
 

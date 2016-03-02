@@ -17,6 +17,7 @@ import com.keepfit.app.view.AlgorithmView;
 import com.keepfit.stepdetection.algorithms.AccelerationData;
 import com.keepfit.stepdetection.algorithms.IStepDetector;
 import com.keepfit.stepdetection.algorithms.StepDetector;
+import com.keepfit.stepdetection.algorithms.chris.ChrisAlgorithm;
 import com.keepfit.stepdetection.algorithms.edward.AngleAlgorithm;
 import com.keepfit.stepdetection.algorithms.edward.EdwardAlgorithm;
 import com.keepfit.stepdetection.algorithms.kornel.KornelAlgorithm;
@@ -46,6 +47,8 @@ public class MainFragment extends BaseFragment {
     private AlgorithmView edwardAlgorithmView;
     private KornelAlgorithm kornelAlgorithm;
     private AlgorithmView kornelAlgorithmView;
+    private ChrisAlgorithm chrisAlgorithm;
+    private AlgorithmView chrisAlgorithmView;
     // DINO ALGORITHM
     private AlgorithmView dinoAlgorithmView;
 
@@ -65,6 +68,7 @@ public class MainFragment extends BaseFragment {
         edwardAlgorithmView = (AlgorithmView) view.findViewById(R.id.edward_algorithm);
         kornelAlgorithmView = (AlgorithmView) view.findViewById(R.id.kornel_algorithm);
         dinoAlgorithmView = (AlgorithmView) view.findViewById(R.id.dino_algorithm);
+        chrisAlgorithmView = (AlgorithmView) view.findViewById(R.id.chris_algorithm);
 
         initializeAlgorithms();
     }
@@ -73,6 +77,7 @@ public class MainFragment extends BaseFragment {
         initializeEdwardAlgorithm();
         initializeKornelAlgorithm();
         initializeDinoAlgorithm();
+        initializeChrisAlgorithm();
     }
 
     private void initializeEdwardAlgorithm() {
@@ -111,6 +116,26 @@ public class MainFragment extends BaseFragment {
         // dinoAlgorithmView.setAlgorithm(dinoAlgorithm);
     }
 
+    private void initializeChrisAlgorithm() {
+        chrisAlgorithm = new ChrisAlgorithm(context);
+        chrisAlgorithmView.setAlgorithm(chrisAlgorithm);
+        stepDetector.registerAlgorithm(chrisAlgorithm);
+        chrisAlgorithmView.setButtonOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (!runningAlgorithms) {
+                    runningAlgorithms = true;
+                    ((Button) v).setText(getResources().getString(R.string.stop));
+                    startChrisAlgorithm();
+                } else {
+                    runningAlgorithms = false;
+                    ((Button) v).setText(getResources().getString(R.string.start));
+                    stopAlgorithms();
+                }
+            }
+        });
+    }
+
     private void startEdwardAlgorithm() {
         boolean accelerometerRegistered = sensorManager.registerListener(stepDetector, sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER), RATE);
         boolean gravityRegister = sensorManager.registerListener(stepDetector, sensorManager.getDefaultSensor(Sensor.TYPE_GRAVITY), RATE);
@@ -124,6 +149,12 @@ public class MainFragment extends BaseFragment {
 
     private void startDinoAlgorithm() {
 
+    }
+
+    private void startChrisAlgorithm() {
+        boolean accelerometerRegistered = sensorManager.registerListener(stepDetector, sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER), RATE);
+        Log.d(TAG, String.format("Accelerometer Registered? %s;", accelerometerRegistered));
+        displayAlgorithmData();
     }
 
     private List<AccelerationData> loadFile() {
@@ -168,6 +199,7 @@ public class MainFragment extends BaseFragment {
                         @Override
                         public void run() {
                             edwardAlgorithmView.update(edwardAlgorithm.getAccelerationData());
+                            chrisAlgorithmView.update(chrisAlgorithm.getAccelerationData());
                         }
                     });
                 }
