@@ -12,7 +12,7 @@ public class DataGatherAlgorithm extends BaseAlgorithm {
     private String dataType;
 
     public DataGatherAlgorithm(Context context, String dataType) {
-        super(context);
+        super(context, dataType);
         this.dataType = dataType;
     }
 

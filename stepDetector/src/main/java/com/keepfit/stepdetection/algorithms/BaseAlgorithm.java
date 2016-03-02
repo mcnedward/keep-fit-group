@@ -37,7 +37,23 @@ public abstract class BaseAlgorithm implements IAlgorithm {
 
         DateFormat df = new SimpleDateFormat("EEE_d_MMM_ yyyy_HHmm");
         String date = df.format(Calendar.getInstance().getTime());
-        dataFile = new File(context.getExternalCacheDir() + String.format("AlgorithmData_%s_%s.csv", date, new Random().nextInt(10)));
+        dataFile = new File(context.getExternalCacheDir() + String.format("/AlgorithmData_%s_%s.csv", date, new Random().nextInt(10)));
+        try {
+            dataFile.createNewFile();
+            printWriter = new PrintWriter(new BufferedWriter(new FileWriter(dataFile)));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public BaseAlgorithm(Context context, String name) {
+        this.context = context;
+        startTime = System.currentTimeMillis();
+        runAlgorithm = true;
+
+        DateFormat df = new SimpleDateFormat("EEE_d_MMM_ yyyy_HHmm");
+        String date = df.format(Calendar.getInstance().getTime());
+        dataFile = new File(context.getExternalCacheDir() + String.format("/%s_AlgorithmData_%s_%s.csv", name, date, new Random().nextInt(10)));
         try {
             dataFile.createNewFile();
             printWriter = new PrintWriter(new BufferedWriter(new FileWriter(dataFile)));

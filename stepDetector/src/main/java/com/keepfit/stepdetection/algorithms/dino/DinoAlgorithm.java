@@ -1,6 +1,9 @@
-package com.keepfit.stepdetection.algorithms;
+package com.keepfit.stepdetection.algorithms.dino;
 
 import android.content.Context;
+
+import com.keepfit.stepdetection.algorithms.AccelerationData;
+import com.keepfit.stepdetection.algorithms.BaseAlgorithm;
 
 import java.io.File;
 import java.util.List;
@@ -14,17 +17,21 @@ public class DinoAlgorithm extends BaseAlgorithm {
         super(context);
     }
 
-    protected  void handleSensorData(AccelerationData ad){
-
+    @Override
+    public void handleSensorData(AccelerationData ad){
+        calculateSteps(ad);
     }
 
-
-    public void notifySensorDataRecieved(AccelerationData ad){
-
+    @Override
+    public void notifySensorDataReceived(AccelerationData ad){
+        calculateSteps(ad);
     }
 
-    public void notifySensorDataRecieved(List<AccelerationData> adList){
-
+    @Override
+    public void notifySensorDataReceived(List<AccelerationData> adList){
+        for (AccelerationData ad : adList) {
+            calculateSteps(ad);
+        }
     }
     //threshold formula is th = (a/(i-k)) + b
 
@@ -50,7 +57,6 @@ public class DinoAlgorithm extends BaseAlgorithm {
     public int getStepCount(){
         return this.steps;
     }
-
 
     public void calculateSteps(AccelerationData ad ){
         //start
@@ -109,8 +115,8 @@ public class DinoAlgorithm extends BaseAlgorithm {
                 if (accZi > max) {
                     max = accZi;
                 }
-                i = i + 1;
             }
+            i = i + 1;
         }
 
     }

@@ -17,8 +17,9 @@ import com.keepfit.app.view.AlgorithmView;
 import com.keepfit.stepdetection.algorithms.AccelerationData;
 import com.keepfit.stepdetection.algorithms.IStepDetector;
 import com.keepfit.stepdetection.algorithms.StepDetector;
-import com.keepfit.stepdetection.algorithms.chris.ChrisAlgorithm;
 import com.keepfit.stepdetection.algorithms.edward.AngleAlgorithm;
+import com.keepfit.stepdetection.algorithms.chris.ChrisAlgorithm;
+import com.keepfit.stepdetection.algorithms.dino.DinoAlgorithm;
 import com.keepfit.stepdetection.algorithms.edward.EdwardAlgorithm;
 import com.keepfit.stepdetection.algorithms.kornel.KornelAlgorithm;
 
@@ -69,7 +70,6 @@ public class MainFragment extends BaseFragment {
         kornelAlgorithmView = (AlgorithmView) view.findViewById(R.id.kornel_algorithm);
         dinoAlgorithmView = (AlgorithmView) view.findViewById(R.id.dino_algorithm);
         chrisAlgorithmView = (AlgorithmView) view.findViewById(R.id.chris_algorithm);
-
         initializeAlgorithms();
     }
 
@@ -111,9 +111,23 @@ public class MainFragment extends BaseFragment {
     }
 
     private void initializeDinoAlgorithm() {
-        // dinoAlgorithm = new DinoAlgorithm(context);
-
-        // dinoAlgorithmView.setAlgorithm(dinoAlgorithm);
+        dinoAlgorithm = new DinoAlgorithm(context);
+        stepDetector.registerAlgorithm(dinoAlgorithm);
+        dinoAlgorithmView.setAlgorithm(dinoAlgorithm);
+        dinoAlgorithmView.setButtonOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (!runningAlgorithms) {
+                    runningAlgorithms = true;
+                    ((Button) v).setText(getResources().getString(R.string.stop));
+                    startDinoAlgorithm();
+                } else {
+                    runningAlgorithms = false;
+                    ((Button) v).setText(getResources().getString(R.string.start));
+                    stopAlgorithms();
+                }
+            }
+        });
     }
 
     private void initializeChrisAlgorithm() {
@@ -148,7 +162,8 @@ public class MainFragment extends BaseFragment {
     }
 
     private void startDinoAlgorithm() {
-
+        sensorManager.registerListener(stepDetector, sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER), RATE);
+        displayAlgorithmData();
     }
 
     private void startChrisAlgorithm() {
@@ -199,6 +214,7 @@ public class MainFragment extends BaseFragment {
                         @Override
                         public void run() {
                             edwardAlgorithmView.update(edwardAlgorithm.getAccelerationData());
+                            dinoAlgorithmView.update(new AccelerationData(0, 0, 0, 0));
                             chrisAlgorithmView.update(chrisAlgorithm.getAccelerationData());
                         }
                     });

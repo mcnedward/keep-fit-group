@@ -70,4 +70,8 @@ public class AccelerationData {
         return Util.magnitude(new double[]{x, y, z});
     }
 
+    @Override
+    public String toString() {
+        return String.format("X: %s; Y: %s; Z:%s; Acceleration: %s; Time: %s", x, y, z, acceleration, timeStamp);
+    }
 }
