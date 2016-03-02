@@ -24,21 +24,25 @@ enum Mode
 
 
 public class ChrisAlgorithm extends BaseAlgorithm {
-
     private static final boolean DEBUG = true;
     public final static double GRAVITY_MS2 = 9.80665;
     private Axis modeAxis = Axis.Y; // Y in pocket mode
     Mode mode = Mode.POCKET;
     boolean skip = false;
     boolean halfFrequency = true;
+    private static final float LOW_PASS_ALPHA = 0.1f;
+    private static final long MIN_TIME_BETWEEN_STEPS = 400;
+    private long timeOfLastStep = 0;
+    private AccelerationData rawData;
 
     //Thresholds
-    private static final double T_POCKET = 0.0086;
+    private static final double T_POCKET = 0.0078; // Good 0.0086
     private static final double T_HAND = 0.01;
 
     //Noise
     private static final double Q = 0.1d; // Good 0.1
     private static final double R = 20d; // Good 20
+    private static final double K_MARKUP_A = 0.25d;  // Good 0.25
 
     // at k=0
     private static final double Z0_POCKET = 1d;
@@ -51,14 +55,13 @@ public class ChrisAlgorithm extends BaseAlgorithm {
 
     // Step data
     private int numSteps = 0;
-    private AccelerationData rawData;
     private List<FilterData> fData;
     private boolean pSlope;
     private boolean nSlope;
     public double maxDevA = 0d;
     public double maxDevB = 0d;
-    private static final double K = 0.25d;  // Good 0.25
     private double aMax = 0d;
+
 
 
     public List<FilterData> getFilterData()
@@ -69,11 +72,13 @@ public class ChrisAlgorithm extends BaseAlgorithm {
     public ChrisAlgorithm(Context context)
     {
         super(context);
-        kalman = new ArrayList<>();
+        kalman = new ArrayList<Double[]>();
         fData = new ArrayList<>();
+
         // k=0
         Double [] k0 = new Double [] {Z0_POCKET, P0_POCKET};
         kalman.add(k0);
+        // (long time, double raw, double kalmanFiltered, double algoFiltered, double stepData, double devA, double devB
         fData.add(new FilterData(0, k0[Xk_idx], k0[Xk_idx], 0d, 0d, 0d, 0d));
         resetSlope();
     }
@@ -86,22 +91,28 @@ public class ChrisAlgorithm extends BaseAlgorithm {
             return;
         }
 
-        rawData  = ad;
+        rawData = ad;
         Double [] kLast = kalman.get(kalman.size()-1);
 
-        ///////// Time Update (Prediction) ///////////////
+        ///////// Time Update (Predict) //////////////////
+        // Get Xkprime
         Double Xkprime = kLast[Xk_idx];
+        // Get Pkprime
         Double Pkprime = kLast[Pk_idx] + Q;
         //////////////////////////////////////////////////
 
-        ///////// Measurement Update (Correction) ////////
+        ///////// Measurement Update (Correct) ///////////
+        // Get Kk
         Double Kk = Xkprime / (Pkprime + R);
+        // Get Xk
         double measured = getAxisValue(ad, modeAxis);
         Double Xk = Xkprime + (Kk * (measured - Xkprime));  // Xk is current kalman filtered value
+        // Get Pk
         Double Pk = (1 - Kk) * Pkprime;
         //////////////////////////////////////////////////
 
         kalman.add(new Double [] {Xk, Pk});
+
 
         long time = ad.getTimeStamp();
         double raw = getAxisValue(ad, modeAxis);
@@ -127,14 +138,14 @@ public class ChrisAlgorithm extends BaseAlgorithm {
                 maxDevB = deviationB;
 
             if(deviationA > threshold){
-                aFiltered = lastAfiltered + K;
+                aFiltered = lastAfiltered + K_MARKUP_A;
             }
             if(deviationB > threshold) {
                 if(lastAfiltered == 0) {
                     aFiltered = aMax;
                 }
                 if(lastAfiltered > 0) {
-                    aFiltered = lastAfiltered - K;
+                    aFiltered = lastAfiltered - K_MARKUP_A;
                 }
                 if(lastAfiltered < 0) {
                     aFiltered = 0;
@@ -165,8 +176,11 @@ public class ChrisAlgorithm extends BaseAlgorithm {
             }
             else if(pSlope == true && nSlope == true) {
                 if(aFiltered == 0) {
-                    numSteps++;
-                    stepData = 1;
+                    if(hasStepTimePassed(time)) {
+                        timeOfLastStep = time;
+                        numSteps++;
+                        stepData = 1;
+                    }
                     resetSlope();
                 }
             }
@@ -237,6 +251,13 @@ public class ChrisAlgorithm extends BaseAlgorithm {
 
     public AccelerationData getAccelerationData() {
         return rawData;
+    }
 
+    private boolean hasStepTimePassed(long timeNow)
+    {
+        if(timeNow - timeOfLastStep >= MIN_TIME_BETWEEN_STEPS)
+            return true;
+        else
+            return false;
     }
 }
