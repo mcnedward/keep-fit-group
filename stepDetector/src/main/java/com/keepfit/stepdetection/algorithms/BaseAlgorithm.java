@@ -24,48 +24,32 @@ public abstract class BaseAlgorithm implements IAlgorithm {
     private static final char CSV_DELIM = ',';
     private static final int MILLISEC_FACTOR = 1000000;
 
-    private Context context;
+    protected Context context;
     private PrintWriter printWriter;
     private File dataFile;
     private long startTime;
     private boolean runAlgorithm;   // Boolean to determine whether the algorithm should be run, or if only data should be gathered.
+    private boolean writeData;
 
     public BaseAlgorithm(Context context) {
         this.context = context;
         startTime = System.currentTimeMillis();
         runAlgorithm = true;
-
-        DateFormat df = new SimpleDateFormat("EEE_d_MMM_ yyyy_HHmm");
-        String date = df.format(Calendar.getInstance().getTime());
-        dataFile = new File(context.getExternalCacheDir() + String.format("/AlgorithmData_%s_%s.csv", date, new Random().nextInt(10)));
-        try {
-            dataFile.createNewFile();
-            printWriter = new PrintWriter(new BufferedWriter(new FileWriter(dataFile)));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
     }
 
     public BaseAlgorithm(Context context, String name) {
         this.context = context;
         startTime = System.currentTimeMillis();
         runAlgorithm = true;
-
-        DateFormat df = new SimpleDateFormat("EEE_d_MMM_ yyyy_HHmm");
-        String date = df.format(Calendar.getInstance().getTime());
-        dataFile = new File(context.getExternalCacheDir() + String.format("/%s_AlgorithmData_%s_%s.csv", name, date, new Random().nextInt(10)));
-        try {
-            dataFile.createNewFile();
-            printWriter = new PrintWriter(new BufferedWriter(new FileWriter(dataFile)));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        createFile(name);
+        writeData = true;
     }
 
     @Override
     public void notifySensorDataReceived(AccelerationData ad) {
         double acceleration = ad.getAcceleration();
-        writeSensorData(ad.getTimeStamp(), ad.getX(), ad.getY(), ad.getZ(), acceleration);
+        if (writeData)
+            writeSensorData(ad.getTimeStamp(), ad.getX(), ad.getY(), ad.getZ(), acceleration);
         if (runAlgorithm)
             handleSensorData(ad);
     }
@@ -90,6 +74,23 @@ public abstract class BaseAlgorithm implements IAlgorithm {
                 Log.e(TAG, "Failed to write sensor event data");
             }
         }
+    }
+
+    @Override
+    public void createFile(String fileName) {
+        DateFormat df = new SimpleDateFormat("EEE_d_MMM_ yyyy_HHmm");
+        String date = df.format(Calendar.getInstance().getTime());
+        dataFile = new File(context.getExternalCacheDir() + String.format("/%s_AlgorithmData_%s_%s.csv", fileName, date, new Random().nextInt(10)));
+        try {
+            dataFile.createNewFile();
+            printWriter = new PrintWriter(new BufferedWriter(new FileWriter(dataFile)));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void setWriteData(boolean writeData) {
+        this.writeData = writeData;
     }
 
     @Override

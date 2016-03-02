@@ -3,8 +3,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:paddingLeft="60dp"
-    android:paddingRight="60dp">
+    android:paddingLeft="10dp"
+    android:paddingRight="10dp">
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -25,10 +25,20 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
-            android:layout_alignParentRight="true"
+            android:layout_toLeftOf="@+id/btn_email_algorithm"
             android:gravity="center"
             android:padding="10dp"
             android:text="@string/start"/>
+
+        <Button
+            android:id="@+id/btn_email_algorithm"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:layout_alignParentRight="true"
+            android:gravity="center"
+            android:padding="10dp"
+            android:text="@string/email"/>
 
     </RelativeLayout>
 

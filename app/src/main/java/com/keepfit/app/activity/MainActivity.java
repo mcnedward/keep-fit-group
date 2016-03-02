@@ -1,8 +1,6 @@
 package com.keepfit.app.activity;
 
 import android.content.Intent;
-import android.hardware.Sensor;
-import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
@@ -11,29 +9,15 @@ import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.View;
 import android.view.WindowManager;
-import android.widget.ToggleButton;
 
 import com.keepfit.app.R;
 import com.keepfit.app.activity.fragment.BaseFragment;
 import com.keepfit.app.activity.fragment.PreferenceFrag;
-import com.keepfit.stepdetection.algorithms.AccelerationData;
-import com.keepfit.stepdetection.algorithms.IStepDetector;
-import com.keepfit.stepdetection.algorithms.StepDetector;
-import com.keepfit.stepdetection.algorithms.edward.AngleAlgorithm;
-import com.keepfit.stepdetection.algorithms.edward.EdwardAlgorithm;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.prefs.Preferences;
 
 public class MainActivity extends AppCompatActivity {
@@ -59,7 +43,7 @@ public class MainActivity extends AppCompatActivity {
         sectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
         viewPager = (ViewPager) findViewById(R.id.container);
         viewPager.setAdapter(sectionsPagerAdapter);
-        viewPager.setOffscreenPageLimit(2);
+        viewPager.setOffscreenPageLimit(5);
 
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(viewPager);
@@ -95,7 +79,7 @@ public class MainActivity extends AppCompatActivity {
     public class SectionsPagerAdapter extends FragmentPagerAdapter implements
             ViewPager.OnPageChangeListener {
 
-        final private static int PAGE_COUNT = 2;
+        final private static int PAGE_COUNT = 5;
 
         public SectionsPagerAdapter(FragmentManager fm) {
             super(fm);

@@ -1,6 +1,5 @@
 package com.keepfit.app.view;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.util.AttributeSet;
@@ -10,8 +9,13 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.keepfit.app.R;
+import com.keepfit.app.utils.Extension;
 import com.keepfit.stepdetection.algorithms.AccelerationData;
 import com.keepfit.stepdetection.algorithms.IAlgorithm;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by Edward on 2/25/2016.
@@ -25,10 +29,11 @@ public class AlgorithmView extends LinearLayout {
     private TextView txtY;
     private TextView txtZ;
     private TextView txtSteps;
-    private Button button;
+    private Button startButton;
+    private Button emailButton;
+    private String title;
 
     private IAlgorithm algorithm;
-    private boolean runningAlgorithms;
 
     public AlgorithmView(Context context) {
         super(context);
@@ -42,13 +47,13 @@ public class AlgorithmView extends LinearLayout {
         this.context = context;
         inflate(context, R.layout.view_algorithm, this);
         initialize();
-        TypedArray a = context.getTheme().obtainStyledAttributes(attrs, R.styleable.AlgorithmView, 0, 0);
-        try {
-            String title = a.getString(R.styleable.AlgorithmView_algorithmTitle);
-            txtTitle.setText(title);
-        } finally {
-            a.recycle();
-        }
+//        TypedArray a = context.getTheme().obtainStyledAttributes(attrs, R.styleable.AlgorithmView, 0, 0);
+//        try {
+//            title = a.getString(R.styleable.AlgorithmView_algorithmTitle);
+//            txtTitle.setText(title);
+//        } finally {
+//            a.recycle();
+//        }
     }
 
     private void initialize() {
@@ -57,14 +62,30 @@ public class AlgorithmView extends LinearLayout {
         txtY = (TextView) findViewById(R.id.txt_y);
         txtZ = (TextView) findViewById(R.id.txt_z);
         txtSteps = (TextView) findViewById(R.id.txt_steps);
-        button = (Button) findViewById(R.id.btn_algorithm);
+        startButton = (Button) findViewById(R.id.btn_algorithm);
+        emailButton = (Button) findViewById(R.id.btn_email_algorithm);
+        setEmailButtonOnClickListener();
     }
 
-    public void setButtonOnClickListener(OnClickListener listener) {
-        button.setOnClickListener(listener);
+    public void setStartButtonOnClickListener(OnClickListener listener) {
+        startButton.setOnClickListener(listener);
+        algorithm.createFile(title);
+    }
+
+    public void setEmailButtonOnClickListener() {
+        emailButton.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                File dataFile = algorithm.getDataFile();
+                List<File> dataFiles = new ArrayList<>();
+                dataFiles.add(dataFile);
+                Extension.emailDataFile(context, dataFiles, new String[] {"edwardmcn64@gmail.com"});
+            }
+        });
     }
 
     public void setTitle(String title) {
+        this.title = title;
         txtTitle.setText(title);
     }
 

@@ -5,7 +5,6 @@ import android.content.Context;
 import com.keepfit.stepdetection.algorithms.AccelerationData;
 import com.keepfit.stepdetection.algorithms.BaseAlgorithm;
 
-import java.io.File;
 import java.util.List;
 
 /**
@@ -47,9 +46,10 @@ public class DinoAlgorithm extends BaseAlgorithm {
     private double max; //highest accZ so far
     private double accZi; //accZ of iPoint
 
-    private double kStepFreq = 1f; // 1(i-k) //not sure if needed //initialised to 0.1f
+    private double kStepFreq = 5f; // 1(i-k) //not sure if needed //initialised to 0.1f
     private double iStepFreq;
 
+    private boolean walkingStarted = false;
     private boolean dataStreamStart = false;
 
     private int steps = 0;
@@ -74,17 +74,6 @@ public class DinoAlgorithm extends BaseAlgorithm {
             iPoint = ad;
             accZi = iPoint.getZ(); //ad = iPoint
 
-
-            /**
-             * This is the hard part, cannot figure out how to derive alpha and beta "constants" as described in paper
-             * initial step frequency set to 0.1, no idea if this is right call, however for subsequent Ks (new steps) they can be set to the i at which a new step is found
-             */
-
-
-            /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-            ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-            ////
-            ////
             double y2, y1, x2, x1;
 
             y2 = (max - accZi);
@@ -95,29 +84,37 @@ public class DinoAlgorithm extends BaseAlgorithm {
 
             alpha = (y2 - y1) / (x2 - x1); // alpha = m = slope, calculate m between kPoint and iPoint
             iStepFreq = 1 / (i - k); //
-           // double tempThreshold = (max - accZi);
-           // beta = tempThreshold - (iStepFreq * alpha); //
             beta = 3.1541f;                                           // This bit doesn't do anything, will ensure new steps are detected with each sample EDIT: conclusion in paper states beta constant was found to be noted value
             threshold = (alpha * iStepFreq) + beta;     //
-            ////
-            /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-            ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+            if(walkingStarted) {
+                if ((max - accZi) >= threshold) { //use threshold to check for step
+                    steps += 1;
 
-            if ((max - accZi) >= threshold) { //use threshold to check for step
-                steps += 1;
-
-                k = i;
-                kPoint = iPoint;
-              //  kStepFreq = iStepFreq;
-                max = accZi;
-            } else {
-                if (accZi > max) {
+                    k = i;
+                    kPoint = iPoint;
+                    //  kStepFreq = iStepFreq;
                     max = accZi;
+                } else {
+                    if (accZi > max) {
+                        max = accZi;
+                    }
+
+                }
+            }
+            else
+            {
+                if((max-accZi) >= 0.08){
+                    walkingStarted = true;
+                    k = i;
                 }
             }
             i = i + 1;
         }
+    }
 
+    @Override
+    public AccelerationData getAccelerationData() {
+        return new AccelerationData(0, 0, accZi, 0);
     }
 }
