@@ -52,6 +52,7 @@ public class MainFragment extends BaseFragment {
     private AlgorithmView chrisAlgorithmView;
     // DINO ALGORITHM
     private AlgorithmView dinoAlgorithmView;
+    private DinoAlgorithm dinoAlgorithm;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
