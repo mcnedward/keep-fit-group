@@ -19,7 +19,7 @@ import java.util.List;
 public class EdwardAlgorithm extends BaseAlgorithm {
     private final static String TAG = "EdwardAlgorithm";
 
-    private final static double SENSOR_VALUE = 9.8;
+    private final static double GRAVITY_1_G = 9.8;
     private final static double THRESHOLD = 0.14;
 
     private List<AccelerationData> accelerationDataList;
@@ -56,7 +56,7 @@ public class EdwardAlgorithm extends BaseAlgorithm {
         notifyAccelerometerSensorChanged(ad.getTimeStamp(), ad.getX(), ad.getY(), ad.getZ(), ad.getAcceleration());
         if (dataIndex == accelerationDataList.size())
             dataIndex = 0;
-        handleGravitySensorData(accelerationDataList.get(dataIndex++));
+//        handleGravitySensorData(accelerationDataList.get(dataIndex++));
     }
 
     private void notifyAccelerometerSensorChanged(long eventTime, double xAcceleration, double yAcceleration, double zAcceleration, double acceleration) {
@@ -79,34 +79,47 @@ public class EdwardAlgorithm extends BaseAlgorithm {
     private double currentXGravity;
     private double currentYGravity;
     private double currentZGravity;
-    private double gravityXAtRestingTime;
-    private double gravityYAtRestingTime;
-    private double gravityZAtRestingTime;
-    private boolean shouldCalculateRestingTime = true;
+
+    private boolean waitForStep;
+    private long timer;
+    private long stepTimer;
+    private double pointToHit;
+    private boolean waitFor0;
 
     private void notifyGravitySensorChanged(long eventTime, double xGravity, double yGravity, double zGravity) {
-        currentXGravity = xGravity;
-        currentYGravity = yGravity;
+        currentXGravity = -2;
+        currentYGravity = -2;
         currentZGravity = zGravity;
-        // Calculate the gravity direction acceleration for each axis
-        double gravityX = getGravityDirectionAccelerationForAxis(xGravity, xAcceleration);
-        double gravityY = getGravityDirectionAccelerationForAxis(yGravity, yAcceleration);
-        double gravityZ = getGravityDirectionAccelerationForAxis(zGravity, zAcceleration);
+        double inclinationAngle = calculateInclinationAngle(zGravity);
 
-        if (shouldCalculateRestingTime) {
-            // Only calculate this once
-            gravityXAtRestingTime = gravityX;
-            gravityYAtRestingTime = gravityY;
-            gravityZAtRestingTime = gravityZ;
+        if (!waitForStep) {
+            if (Math.abs(inclinationAngle) > THRESHOLD) {
+                waitForStep = true;
+                pointToHit = inclinationAngle * -1;
+                timer = System.nanoTime();
+            }
+        } else {
+            if (hasHalfSecondPassed(timer)) {
+                waitForStep = false;
+                return;
+            }
+            if (waitFor0) {
+                if (inclinationAngle >= 0) {
+                    // Step hit
+                    numberOfSteps++;
+                    waitFor0 = false;
+                    waitForStep = false;
+                }
+            }
+            if (Math.abs(inclinationAngle) > THRESHOLD) {
+                if (inclinationAngle <= pointToHit) {
+                    waitFor0 = true;
+                    timer = System.nanoTime();
+                }
+            }
         }
-        shouldCalculateRestingTime = false;
 
-        // Call method to check threshold and wait
-//        checkThreshold(gravityX);
-//        checkThreshold(gravityY);
-        checkThreshold(gravityZ);
-
-        writeSensorData(eventTime, gravityX, gravityY, gravityZ, 0);
+        writeSensorData(eventTime, xGravity, yGravity, zGravity, 0);
     }
 
     private double calculate3PointAverage(double[] values) {
@@ -131,44 +144,56 @@ public class EdwardAlgorithm extends BaseAlgorithm {
         return average;
     }
 
-    private double pointToHit;
+    private boolean checkUp;
     private boolean waitForCheckpoint;
-    private long timer;
-    private long stepTimer = System.nanoTime();
     private static long HALF_SECOND = 500000000;
+    private double thresholdToCheck;
 
-    private void checkThreshold(double gravityDirectionAcceleration) {
+    private void checkThreshold(double gravityDirectionAcceleration, double gravityComponent, double gravityAtRestingTime) {
         if (waitForCheckpoint) {
             if (hasHalfSecondPassed(timer)) {
-                waitForCheckpoint = false;
                 Log.d(TAG, "TIMEOUT: No step counted");
+                waitForCheckpoint = false;
                 timer = System.nanoTime();
-                shouldCalculateRestingTime = true;
             } else {
                 Log.d(TAG, "GDA: " + gravityDirectionAcceleration + "; POINT TO HIT: " + pointToHit);
-                if (gravityDirectionAcceleration <= pointToHit && Math.abs(gravityDirectionAcceleration) > THRESHOLD) {
-                    if (!hasHalfSecondPassed(timer)) {
-                        // Stepped!
-                        if (hasHalfSecondPassed(stepTimer)) {
-                            Log.d(TAG, "COUNTING STEPS: " + stepTimer);
-                            numberOfSteps++;
-                            stepTimer = System.nanoTime();
+                thresholdToCheck = Math.abs(gravityAtRestingTime - gravityComponent);
+                if (thresholdToCheck > THRESHOLD) {
+                    boolean hitStep;
+                    if (checkUp)
+                        hitStep = gravityComponent >= pointToHit;
+                    else
+                        hitStep = gravityComponent <= pointToHit;
+                    if (hitStep) {
+                        if (!hasHalfSecondPassed(timer)) {
+                            // Stepped!
+                            if (hasHalfSecondPassed(stepTimer)) {
+                                Log.d(TAG, "COUNTING STEPS: " + stepTimer);
+                                numberOfSteps++;
+                                stepTimer = System.nanoTime();
+                            }
+                            waitForCheckpoint = false;
+                            timer = System.nanoTime();
                         }
-                        waitForCheckpoint = false;
-                        timer = System.nanoTime();
                     }
                 }
             }
         } else {
-            Log.d(TAG, "GDA: " + gravityDirectionAcceleration);
-            if (Math.abs(gravityDirectionAcceleration) > THRESHOLD) {
+            thresholdToCheck = Math.abs(gravityAtRestingTime - gravityComponent);
+            if (thresholdToCheck > THRESHOLD) {
                 // Start timer and wait for the this gravityDirectionAcceleration value to be hit again
-                double differenceToHit = gravityDirectionAcceleration - gravityZAtRestingTime;
-                pointToHit = gravityZAtRestingTime - differenceToHit;
+                double differenceToHit = Math.abs(gravityComponent - gravityAtRestingTime);
+                if (gravityComponent <= gravityAtRestingTime) {
+                    pointToHit = gravityAtRestingTime + differenceToHit;
+                    checkUp = true;
+                }
+                else {
+                    pointToHit = gravityAtRestingTime - differenceToHit;
+                    checkUp = false;
+                }
                 waitForCheckpoint = true;
                 timer = System.nanoTime();
-            } else {
-                shouldCalculateRestingTime = true;
+                Log.d(TAG, "Check up: " + checkUp + "; Point to hit: " + pointToHit + "; Gravity Component: " + gravityComponent + "; Resting Gravity: " + gravityAtRestingTime);
             }
         }
     }
@@ -178,8 +203,8 @@ public class EdwardAlgorithm extends BaseAlgorithm {
     }
 
     private double getGravityDirectionAccelerationForAxis(double gravityComponent, double acceleration) {
-//        double inclinationAngle = calculateInclinationAngle(gravityComponent);
-        double gravityDirectionAcceleration = calculateGravityDirectionAcceleration(gravityComponent, acceleration);
+        double inclinationAngle = calculateInclinationAngle(gravityComponent);
+        double gravityDirectionAcceleration = calculateGravityDirectionAcceleration(inclinationAngle, acceleration);
         return gravityDirectionAcceleration;
     }
 
@@ -190,7 +215,7 @@ public class EdwardAlgorithm extends BaseAlgorithm {
      * @return
      */
     private double calculateInclinationAngle(double gravity) {
-        return Math.asin(gravity / 1);
+        return Math.asin(gravity / GRAVITY_1_G);
     }
 
     /**
@@ -201,7 +226,7 @@ public class EdwardAlgorithm extends BaseAlgorithm {
      * @return
      */
     private double calculateGravityDirectionAcceleration(double inclinationAngle, double acceleration) {
-        return inclinationAngle * Math.sin(inclinationAngle);
+        return acceleration * Math.sin(inclinationAngle);
     }
 
     private void shuffleValues(double[] values) {
@@ -217,7 +242,7 @@ public class EdwardAlgorithm extends BaseAlgorithm {
     }
 
     public AccelerationData getAccelerationData() {
-        return new AccelerationData(xAcceleration, yAcceleration, zAcceleration, timestamp);
+        return new AccelerationData(currentXGravity, currentYGravity, currentZGravity, timestamp);
     }
 
     private void loadGravityData() {
