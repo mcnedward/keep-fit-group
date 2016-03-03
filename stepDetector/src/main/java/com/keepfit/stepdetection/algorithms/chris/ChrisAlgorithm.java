@@ -31,7 +31,7 @@ public class ChrisAlgorithm extends BaseAlgorithm {
     boolean skip = false;
     boolean halfFrequency = true;
     private static final float LOW_PASS_ALPHA = 0.1f;
-    private static final long MIN_TIME_BETWEEN_STEPS = 400;
+    private static final long MIN_TIME_BETWEEN_STEPS = 340;
     private long timeOfLastStep = 0;
     private AccelerationData rawData;
 
