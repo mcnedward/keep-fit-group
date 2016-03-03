@@ -1,6 +1,7 @@
 package com.keepfit.app.activity.fragment.algorithm;
 
 import android.content.Context;
+import android.hardware.Sensor;
 
 import com.keepfit.stepdetection.algorithms.IAlgorithm;
 import com.keepfit.stepdetection.algorithms.chris.ChrisAlgorithm;
@@ -21,6 +22,7 @@ public class ChrisFragment extends AlgorithmFragment {
 
     @Override
     protected void startAlgorithm() {
+        sensorManager.registerListener(stepDetector, sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER), RATE);
     }
 
     @Override
