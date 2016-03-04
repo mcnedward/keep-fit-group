@@ -30,19 +30,17 @@ public class ChrisAlgorithm extends BaseAlgorithm {
     Mode mode = Mode.POCKET;
     boolean skip = false;
     boolean halfFrequency = false;
-    private static final float LOW_PASS_ALPHA = 0.1f;
-    private static final long MIN_TIME_BETWEEN_STEPS = 400;
+    private static final long MIN_TIME_BETWEEN_STEPS = 340;
     private long timeOfLastStep = 0;
-    private AccelerationData rawData;
 
-    // Thresholds
+    //Thresholds
     private static final double T_POCKET = 0.0078; // Good 0.0086
     private static final double T_HAND = 0.01;
 
-    // Noise
+    //Noise
     private static final double Q = 0.1d; // Good 0.1
     private static final double R = 20d; // Good 20
-    private static final double K_MARKUP_A = 0.25d; // Good 0.25
+    private static final double K_MARKUP_A = 0.25d;  // Good 0.25
 
     // at k=0
     private static final double Z0_POCKET = 1d;
@@ -61,6 +59,7 @@ public class ChrisAlgorithm extends BaseAlgorithm {
     public double maxDevA = 0d;
     public double maxDevB = 0d;
     private double aMax = 0d;
+    private double stepData = 0d;
 
     public ChrisAlgorithm(Context context) {
         super(context, NAME);
@@ -91,7 +90,6 @@ public class ChrisAlgorithm extends BaseAlgorithm {
             return;
         }
 
-        rawData = ad;
         Double[] kLast = kalman.get(kalman.size() - 1);
 
         ///////// Time Update (Predict) //////////////////
@@ -106,20 +104,19 @@ public class ChrisAlgorithm extends BaseAlgorithm {
         Double Kk = Xkprime / (Pkprime + R);
         // Get Xk
         double measured = getAxisValue(ad, modeAxis);
-        Double Xk = Xkprime + (Kk * (measured - Xkprime)); // Xk is current
-        // kalman filtered
-        // value
+        Double Xk = Xkprime + (Kk * (measured - Xkprime));  // Xk is current kalman filtered value
         // Get Pk
         Double Pk = (1 - Kk) * Pkprime;
         //////////////////////////////////////////////////
 
         kalman.add(new Double[]{Xk, Pk});
 
+
         long time = ad.getTimeStamp();
         double raw = getAxisValue(ad, modeAxis);
         double kFiltered = Xk;
         double aFiltered = 0d;
-        double stepData = 0d;
+        stepData = 0d;
         double deviationA = 0;
         double deviationB = 0;
         // Algorithm Filter
@@ -158,6 +155,7 @@ public class ChrisAlgorithm extends BaseAlgorithm {
             if (aFiltered > aMax)
                 aMax = aFiltered;
 
+
             // Step counter - count pairs of +ve, -ve slopes
             if (aFiltered > lastAfiltered)
                 pSlope = true;
@@ -179,6 +177,11 @@ public class ChrisAlgorithm extends BaseAlgorithm {
                     }
                     resetSlope();
                 }
+            }
+
+            if (DEBUG) {
+                System.out.println(String.format("time:%s\n\traw:%s\n\tkFil:%s\n\taDv:%s\n\tbDv:%s\n",
+                        time, raw, kFiltered, deviationA, deviationB));
             }
         }
 
@@ -235,14 +238,21 @@ public class ChrisAlgorithm extends BaseAlgorithm {
         return this.numSteps;
     }
 
-    public AccelerationData getAccelerationData() {
-        return rawData;
-    }
-
     private boolean hasStepTimePassed(long timeNow) {
         if (timeNow - timeOfLastStep >= MIN_TIME_BETWEEN_STEPS)
             return true;
         else
             return false;
+    }
+
+    @Override
+    public AccelerationData getAccelerationData() {
+        if (fData.size() > 0) {
+            return new AccelerationData(0, 0,
+                    fData.get(fData.size() - 1).getStepData(),
+                    fData.get(fData.size() - 1).getTime());
+        } else {
+            return new AccelerationData(0, 0, 0, 0);
+        }
     }
 }

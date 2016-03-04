@@ -46,7 +46,6 @@ public abstract class BaseAlgorithm implements IAlgorithm {
 
     public BaseAlgorithm(String name) {
         this(null, name);
-        writeData = true;
     }
 
     @Override

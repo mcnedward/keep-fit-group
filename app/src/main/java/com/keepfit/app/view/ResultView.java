@@ -2,6 +2,7 @@ package com.keepfit.app.view;
 
 import android.content.Context;
 import android.graphics.Color;
+import android.support.v4.content.ContextCompat;
 import android.util.AttributeSet;
 import android.util.Pair;
 import android.widget.LinearLayout;
@@ -18,8 +19,10 @@ import com.androidplot.xy.XYStepMode;
 import com.keepfit.app.R;
 import com.keepfit.app.utils.DataFile;
 import com.keepfit.stepdetection.algorithms.IAlgorithm;
+import com.keepfit.stepdetection.algorithms.chris.ChrisAlgorithm;
+import com.keepfit.stepdetection.algorithms.dino.DinoAlgorithm;
+import com.keepfit.stepdetection.algorithms.kornel.KornelAlgorithm;
 
-import java.text.DateFormatSymbols;
 import java.text.FieldPosition;
 import java.text.NumberFormat;
 import java.text.ParsePosition;
@@ -34,17 +37,17 @@ public class ResultView extends LinearLayout {
     private List<DataFile> dataFiles;
     private Context context;
 
-    private AlgoListItem dinoItem;
-    private AlgoListItem kornelItem;
-    private AlgoListItem chrisItem;
-
     private XYPlot plot;
-    private XYSeries series1;
-    private XYSeries series2;
+    private XYSeries seriesReal;
+    private XYSeries seriesDino;
+    private XYSeries seriesKornel;
+    private XYSeries seriesChris;
     private Pair<Integer, XYSeries> selection;
     private MyBarFormatter selectionFormatter;
-    private MyBarFormatter formatter1;
-    private MyBarFormatter formatter2;
+    private MyBarFormatter formatterReal;
+    private MyBarFormatter formatterDino;
+    private MyBarFormatter formatterKornel;
+    private MyBarFormatter formatterChris;
     private SeekBar sbFixedWidth, sbVariableWidth;
 
 
@@ -53,7 +56,6 @@ public class ResultView extends LinearLayout {
         this.dataFiles = dataFiles;
         this.context = context;
         inflate(context, R.layout.view_result, this);
-//        initialize();
         initializePlot();
     }
 
@@ -66,16 +68,18 @@ public class ResultView extends LinearLayout {
 
     private void setUpStep() {
         // reduce the number of range labels
-        plot.setTicksPerRangeLabel(3);
+        plot.setTicksPerRangeLabel(4);
+        plot.setTicksPerDomainLabel(5);
         plot.setRangeLowerBoundary(0, BoundaryMode.FIXED);
-        plot.setTicksPerDomainLabel(2);
         plot.setRangeStep(XYStepMode.INCREMENT_BY_VAL, 2);
     }
 
     private void initializePlot() {
         plot = (XYPlot) findViewById(R.id.data_plot);
-        formatter1 = new MyBarFormatter(Color.argb(200, 100, 150, 100), Color.LTGRAY);
-        formatter2 = new MyBarFormatter(Color.argb(200, 100, 100, 150), Color.LTGRAY);
+        formatterReal = new MyBarFormatter(ContextCompat.getColor(context, R.color.Yellow), Color.LTGRAY);
+        formatterDino = new MyBarFormatter(ContextCompat.getColor(context, R.color.FireBrick), Color.LTGRAY);
+        formatterKornel = new MyBarFormatter(ContextCompat.getColor(context, R.color.LimeGreen), Color.LTGRAY);
+        formatterChris = new MyBarFormatter(ContextCompat.getColor(context, R.color.DodgerBlue), Color.LTGRAY);
         selectionFormatter = new MyBarFormatter(Color.YELLOW, Color.WHITE);
 
         if (dataFiles != null)
@@ -99,7 +103,7 @@ public class ResultView extends LinearLayout {
         });
 
         sbFixedWidth = (SeekBar) findViewById(R.id.sb_width);
-        sbFixedWidth.setProgress(25);
+        sbFixedWidth.setProgress(50);
         sbFixedWidth.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
@@ -126,18 +130,22 @@ public class ResultView extends LinearLayout {
         getDataToPlot();
 
         // Setup our Series with the selected number of elements
-        series1 = new SimpleXYSeries(realSteps, SimpleXYSeries.ArrayFormat.Y_VALS_ONLY, "Real Steps");
-        series2 = new SimpleXYSeries(countedSteps, SimpleXYSeries.ArrayFormat.Y_VALS_ONLY, "Counted Steps");
+        seriesReal = new SimpleXYSeries(realSteps, SimpleXYSeries.ArrayFormat.Y_VALS_ONLY, "Real Steps");
+        seriesDino = new SimpleXYSeries(dinoSteps, SimpleXYSeries.ArrayFormat.Y_VALS_ONLY, "Dino Steps");
+        seriesKornel = new SimpleXYSeries(kornelSteps, SimpleXYSeries.ArrayFormat.Y_VALS_ONLY, "Kornel Steps");
+        seriesChris = new SimpleXYSeries(chrisSteps, SimpleXYSeries.ArrayFormat.Y_VALS_ONLY, "Chris Steps");
 
         // add a new series' to the xyplot:
-        plot.addSeries(series1, formatter1);
-        plot.addSeries(series2, formatter2);
+        plot.addSeries(seriesReal, formatterReal);
+        plot.addSeries(seriesDino, formatterDino);
+        plot.addSeries(seriesKornel, formatterKornel);
+        plot.addSeries(seriesChris, formatterChris);
 
         // Setup the BarRenderer with our selected options
         MyBarRenderer renderer = ((MyBarRenderer)plot.getRenderer(MyBarRenderer.class));
         renderer.setBarRenderStyle(BarRenderer.BarRenderStyle.SIDE_BY_SIDE);
         renderer.setBarWidthStyle(BarRenderer.BarWidthStyle.FIXED_WIDTH);
-        renderer.setBarWidth(sbFixedWidth.getProgress());
+        renderer.setBarWidth((float) (sbFixedWidth.getProgress() * 1.5));
         renderer.setBarGap(2);
 
         plot.setRangeTopMin(dataFiles.get(0).getNumberOfRealSteps() + 5);
@@ -146,15 +154,39 @@ public class ResultView extends LinearLayout {
     }
 
     List<Integer> realSteps;
-    List<Integer> countedSteps;
+    List<Integer> dinoSteps;
+    List<Integer> kornelSteps;
+    List<Integer> chrisSteps;
     private void getDataToPlot() {
         realSteps = new ArrayList<>();
-        countedSteps = new ArrayList<>();
-        for (DataFile file : dataFiles)
+        dinoSteps = new ArrayList<>();
+        kornelSteps = new ArrayList<>();
+        chrisSteps = new ArrayList<>();
+        realSteps.add(0);
+        dinoSteps.add(0);
+        kornelSteps.add(0);
+        chrisSteps.add(0);
+        for (DataFile file : dataFiles) {
+            realSteps.add(file.getNumberOfRealSteps());
             for (IAlgorithm algorithm : file.getAlgorithms()) {
-                realSteps.add(file.getNumberOfRealSteps());
-                countedSteps.add(algorithm.getStepCount());
+                if (algorithm instanceof DinoAlgorithm) {
+                    dinoSteps.add(algorithm.getStepCount());
+                    continue;
+                }
+                if (algorithm instanceof KornelAlgorithm) {
+                    kornelSteps.add(algorithm.getStepCount());
+                    continue;
+                }
+                if (algorithm instanceof ChrisAlgorithm) {
+                    chrisSteps.add(algorithm.getStepCount());
+                    continue;
+                }
             }
+        }
+        realSteps.add(0);
+        dinoSteps.add(0);
+        kornelSteps.add(0);
+        chrisSteps.add(0);
     }
 
     class MyBarFormatter extends BarFormatter {

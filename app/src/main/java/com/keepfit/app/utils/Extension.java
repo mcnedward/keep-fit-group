@@ -36,8 +36,10 @@ public class Extension {
         context.startActivity(Intent.createChooser(intent, "Sending email..."));
     }
 
-    public static DataFile handleReader(BufferedReader reader, int numberOfRealSteps) throws IOException {
-        DataFile dataFile = new DataFile(numberOfRealSteps);
+    private static final int MS_TO_SEC = 1000;
+
+    public static DataFile handleReader(BufferedReader reader, int numberOfRealSteps, int runNumber) throws IOException {
+        DataFile dataFile = new DataFile(numberOfRealSteps, runNumber);
         List<AccelerationData> data = new ArrayList<>();
 
         String line;
@@ -54,7 +56,7 @@ public class Extension {
             }
             String[] values = line.split("\t");
             double time = Double.parseDouble(values[0]);
-            long timestamp = (long) (time * 10000000);
+            long timestamp = (long) (time * MS_TO_SEC);
             data.add(new AccelerationData(Double.parseDouble(values[1]), Double.parseDouble(values[2]),
                     Double.parseDouble(values[3]), timestamp));
             skip = true;

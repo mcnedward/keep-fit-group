@@ -60,10 +60,11 @@ public class DataFolderLoader extends AsyncTaskLoader<List<DataFolder>> {
             listAssetFiles("Finished");
             for (DataFolder folder : folders) {
                 List<DataFile> files = new ArrayList<>();
+                int i = 1;
                 for (String file : folder.getFileNames()) {
                     InputStream stream = context.getAssets().open(file);
                     BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
-                    files.add(Extension.handleReader(reader, folder.getNumberOfSteps()));
+                    files.add(Extension.handleReader(reader, folder.getNumberOfSteps(), i++));
                 }
                 folder.setFiles(files);
                 dataFolders.add(folder);
@@ -113,6 +114,10 @@ public class DataFolderLoader extends AsyncTaskLoader<List<DataFolder>> {
                 for (IAlgorithm algorithm : algorithms) {
                     algorithm.notifySensorDataReceived(file.getData());
                     file.addAlgorithm(algorithm);
+                    Log.i(TAG, String.format(
+                            "Algorithm: %s; Author: %s; Number Of Real Steps: %s; Mode: %s; Orientation: %s; Run Number: %s; Number of Algorithm Steps: %s",
+                            algorithm.getName(), folder.getAuthor(), folder.getNumberOfSteps(), folder.getMode(),
+                            folder.getOrientation(), file.getRunNumber(), algorithm.getStepCount()));
                 }
                 initializeAlgorithms();
             }

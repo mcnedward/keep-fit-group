@@ -14,9 +14,11 @@ public class DataFile {
     private List<AccelerationData> data;
     private List<IAlgorithm> algorithms;
     private int numberOfRealSteps;
+    private int runNumber;
 
-    public DataFile(int numberOfRealSteps) {
+    public DataFile(int numberOfRealSteps, int runNumber) {
         this.numberOfRealSteps = numberOfRealSteps;
+        this.runNumber = runNumber;
         data = new ArrayList<>();
         algorithms = new ArrayList<>();
     }
@@ -53,5 +55,13 @@ public class DataFile {
 
     public void setNumberOfRealSteps(int numberOfRealSteps) {
         this.numberOfRealSteps = numberOfRealSteps;
+    }
+
+    public int getRunNumber() {
+        return runNumber;
+    }
+
+    public void setRunNumber(int runNumber) {
+        this.runNumber = runNumber;
     }
 }
