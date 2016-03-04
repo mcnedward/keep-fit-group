@@ -12,22 +12,28 @@ import java.util.List;
  */
 public class DinoAlgorithm extends BaseAlgorithm {
 
+    private static String NAME = "Dino Algorithm";
+
     public DinoAlgorithm(Context context) {
-        super(context);
+        super(context, NAME);
+    }
+
+    public DinoAlgorithm() {
+        super(NAME);
     }
 
     @Override
-    public void handleSensorData(AccelerationData ad){
+    public void handleSensorData(AccelerationData ad) {
         calculateSteps(ad);
     }
 
     @Override
-    public void notifySensorDataReceived(AccelerationData ad){
+    public void notifySensorDataReceived(AccelerationData ad) {
         calculateSteps(ad);
     }
 
     @Override
-    public void notifySensorDataReceived(List<AccelerationData> adList){
+    public void notifySensorDataReceived(List<AccelerationData> adList) {
         for (AccelerationData ad : adList) {
             calculateSteps(ad);
         }
@@ -54,23 +60,20 @@ public class DinoAlgorithm extends BaseAlgorithm {
 
     private int steps = 0;
 
-    public int getStepCount(){
+    public int getStepCount() {
         return this.steps;
     }
 
-    public void calculateSteps(AccelerationData ad ) {
-        writeSensorData(ad);
+    public void calculateSteps(AccelerationData ad) {
         //start
-        if(!dataStreamStart) { //if this is our first sample
+        if (!dataStreamStart) { //if this is our first sample
             //k = sample number of sample where start point of walking is detected
             kPoint = ad;
             max = kPoint.getZ();
             k = 0;
             i = k + 1;
             dataStreamStart = true;
-        }
-
-        else {
+        } else {
             //while data is coming in
             iPoint = ad;
             accZi = iPoint.getZ(); //ad = iPoint
@@ -88,7 +91,7 @@ public class DinoAlgorithm extends BaseAlgorithm {
             beta = 3.1541f;                                           // This bit doesn't do anything, will ensure new steps are detected with each sample EDIT: conclusion in paper states beta constant was found to be noted value
             threshold = (alpha * iStepFreq) + beta;     //
 
-            if(walkingStarted) {
+            if (walkingStarted) {
                 if ((max - accZi) >= threshold) { //use threshold to check for step
                     steps += 1;
 
@@ -102,10 +105,8 @@ public class DinoAlgorithm extends BaseAlgorithm {
                     }
 
                 }
-            }
-            else
-            {
-                if((max-accZi) >= 0.08){
+            } else {
+                if ((max - accZi) >= 0.08) {
                     walkingStarted = true;
                     k = i;
                 }

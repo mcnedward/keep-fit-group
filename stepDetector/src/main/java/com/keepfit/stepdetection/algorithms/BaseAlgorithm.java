@@ -29,19 +29,23 @@ public abstract class BaseAlgorithm implements IAlgorithm {
     private long startTime;
     private boolean runAlgorithm;   // Boolean to determine whether the algorithm should be run, or if only data should be gathered.
     private boolean writeData;
+    private String name;
 
     public BaseAlgorithm(Context context) {
-        this.context = context;
-        startTime = System.currentTimeMillis();
-        runAlgorithm = true;
-        createFile("Edward");
+        this(context, "BaseAlgorithm");
     }
 
     public BaseAlgorithm(Context context, String name) {
         this.context = context;
+        this.name = name;
         startTime = System.currentTimeMillis();
         runAlgorithm = true;
-        createFile(name);
+        if (context != null)
+            createFile(name);
+    }
+
+    public BaseAlgorithm(String name) {
+        this(null, name);
         writeData = true;
     }
 
@@ -97,7 +101,7 @@ public abstract class BaseAlgorithm implements IAlgorithm {
         DateFormat df = new SimpleDateFormat("EEE_d_MMM_ yyyy_HHmm");
         String date = df.format(Calendar.getInstance().getTime());
         dataFile = new File(context.getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS)
-        + String.format("/%s_AlgorithmData_%s_%s.csv", fileName, date, new Random().nextInt(10)));
+                + String.format("/%s_AlgorithmData_%s_%s.csv", fileName, date, new Random().nextInt(10)));
         try {
             dataFile.createNewFile();
             printWriter = new PrintWriter(new BufferedWriter(new FileWriter(dataFile)));
@@ -113,6 +117,11 @@ public abstract class BaseAlgorithm implements IAlgorithm {
     @Override
     public File getDataFile() {
         return dataFile;
+    }
+
+    @Override
+    public String getName() {
+        return name;
     }
 
     @Override

@@ -28,6 +28,7 @@ public class ResultsFragment extends BaseFragment implements LoaderManager.Loade
 
     private Context context;
     private View view;
+    private View loadingPanel;
     private DataFolderAdapter adapter;
     private List<DataFolder> dataFolders = new ArrayList<>();
 
@@ -55,6 +56,8 @@ public class ResultsFragment extends BaseFragment implements LoaderManager.Loade
         adapter = new DataFolderAdapter(dataFolders, context);
         ExpandableListView listView = (ExpandableListView) view.findViewById(R.id.list_results);
         listView.setAdapter(adapter);
+
+        loadingPanel = view.findViewById(R.id.loading_panel);
     }
 
     @Override
@@ -67,6 +70,7 @@ public class ResultsFragment extends BaseFragment implements LoaderManager.Loade
         Log.d(TAG, String.format("onLoadFinished() called! Loading data!"));
         adapter.setGroups(data);
         adapter.notifyDataSetChanged();
+        loadingPanel.setVisibility(View.GONE);
     }
 
     @Override
@@ -74,5 +78,6 @@ public class ResultsFragment extends BaseFragment implements LoaderManager.Loade
         loader.reset();
         adapter.reset();
         adapter.notifyDataSetChanged();
+        loadingPanel.setVisibility(View.VISIBLE);
     }
 }

@@ -34,22 +34,24 @@ public class DataFolderLoader extends AsyncTaskLoader<List<DataFolder>> {
     }
 
     private void initializeAlgorithms() {
-//        algorithms = new ArrayList<>();
-//        EdwardAlgorithm edwardAlgorithm = new EdwardAlgorithm("Edward Algorithm");
-//        DinoAlgorithm dinoAlgorithm = new DinoAlgorithm("Dino Algorithm");
-//        KornelAlgorithm kornelAlgorithm = new KornelAlgorithm("Kornel Algorithm");
-//        ChrisAlgorithm chrisAlgorithm = new ChrisAlgorithm("Chris Algorithm");
-//        // algorithms.add(edwardAlgorithm);
-//        algorithms.add(dinoAlgorithm);
-//        algorithms.add(kornelAlgorithm);
-//        algorithms.add(chrisAlgorithm);
+        algorithms = new ArrayList<>();
+        EdwardAlgorithm edwardAlgorithm = new EdwardAlgorithm();
+        DinoAlgorithm dinoAlgorithm = new DinoAlgorithm();
+        KornelAlgorithm kornelAlgorithm = new KornelAlgorithm();
+        ChrisAlgorithm chrisAlgorithm = new ChrisAlgorithm();
+        // algorithms.add(edwardAlgorithm);
+        algorithms.add(dinoAlgorithm);
+        algorithms.add(kornelAlgorithm);
+        algorithms.add(chrisAlgorithm);
     }
 
     @Override
     public List<DataFolder> loadInBackground() {
-        List<DataFolder> dataFiles = new ArrayList<>();
-        parseDataFiles(dataFiles);
-        return dataFiles;
+        List<DataFolder> dataFolders = new ArrayList<>();
+        parseDataFiles(dataFolders);
+        if (dataFolders.size() > 0)
+            analyze(dataFolders);
+        return dataFolders;
     }
 
     private void parseDataFiles(List<DataFolder> dataFolders) {
@@ -61,7 +63,7 @@ public class DataFolderLoader extends AsyncTaskLoader<List<DataFolder>> {
                 for (String file : folder.getFileNames()) {
                     InputStream stream = context.getAssets().open(file);
                     BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
-                    files.add(Extension.handleReader(reader, file));
+                    files.add(Extension.handleReader(reader, folder.getNumberOfSteps()));
                 }
                 folder.setFiles(files);
                 dataFolders.add(folder);
@@ -104,6 +106,17 @@ public class DataFolderLoader extends AsyncTaskLoader<List<DataFolder>> {
             return false;
         }
         return true;
+    }
+    private void analyze(List<DataFolder> dataFolders) {
+        for (DataFolder folder : dataFolders) {
+            for (DataFile file : folder.getFiles()) {
+                for (IAlgorithm algorithm : algorithms) {
+                    algorithm.notifySensorDataReceived(file.getData());
+                    file.addAlgorithm(algorithm);
+                }
+                initializeAlgorithms();
+            }
+        }
     }
 
     /**

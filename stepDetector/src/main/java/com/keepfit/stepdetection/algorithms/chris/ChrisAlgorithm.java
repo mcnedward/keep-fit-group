@@ -20,18 +20,18 @@ enum Mode {
     POCKET, HAND
 };
 
-
 public class ChrisAlgorithm extends BaseAlgorithm {
+
+    private static String NAME = "Chris Algorithm";
     private static final boolean DEBUG = false;
     public final static double GRAVITY_MS2 = 9.80665;
+
     private Axis modeAxis = Axis.Y; // Y in pocket mode
     Mode mode = Mode.POCKET;
     boolean skip = false;
-    boolean halfFrequency = true;
-    private static final float LOW_PASS_ALPHA = 0.1f;
+    boolean halfFrequency = false;
     private static final long MIN_TIME_BETWEEN_STEPS = 340;
     private long timeOfLastStep = 0;
-    private AccelerationData rawData;
 
     //Thresholds
     private static final double T_POCKET = 0.0078; // Good 0.0086
@@ -59,6 +59,7 @@ public class ChrisAlgorithm extends BaseAlgorithm {
     public double maxDevA = 0d;
     public double maxDevB = 0d;
     private double aMax = 0d;
+    private double stepData = 0d;
 
 
     public List<FilterData> getFilterData() {
@@ -66,7 +67,16 @@ public class ChrisAlgorithm extends BaseAlgorithm {
     }
 
     public ChrisAlgorithm(Context context) {
-        super(context);
+        super(context, NAME);
+        initialize();
+    }
+
+    public ChrisAlgorithm() {
+        super(NAME);
+        initialize();
+    }
+
+    private void initialize() {
         kalman = new ArrayList<Double[]>();
         fData = new ArrayList<>();
 
@@ -78,15 +88,12 @@ public class ChrisAlgorithm extends BaseAlgorithm {
         resetSlope();
     }
 
-    @Override
     public void handleSensorData(AccelerationData ad) {
-        writeSensorData(ad);
         if (halfFrequency && skip == true) {
             skip = false;
             return;
         }
 
-        rawData = ad;
         Double[] kLast = kalman.get(kalman.size() - 1);
 
         ///////// Time Update (Predict) //////////////////
@@ -113,7 +120,7 @@ public class ChrisAlgorithm extends BaseAlgorithm {
         double raw = getAxisValue(ad, modeAxis);
         double kFiltered = Xk;
         double aFiltered = 0d;
-        double stepData = 0d;
+        stepData = 0d;
         double deviationA = 0;
         double deviationB = 0;
         // Algorithm Filter
@@ -235,14 +242,21 @@ public class ChrisAlgorithm extends BaseAlgorithm {
         return this.numSteps;
     }
 
-    public AccelerationData getAccelerationData() {
-        return rawData;
-    }
-
     private boolean hasStepTimePassed(long timeNow) {
         if (timeNow - timeOfLastStep >= MIN_TIME_BETWEEN_STEPS)
             return true;
         else
             return false;
+    }
+
+    @Override
+    public AccelerationData getAccelerationData() {
+        if (fData.size() > 0) {
+            return new AccelerationData(0, 0,
+                    fData.get(fData.size() - 1).getStepData(),
+                    fData.get(fData.size() - 1).getTime());
+        } else {
+            return new AccelerationData(0, 0, 0, 0);
+        }
     }
 }

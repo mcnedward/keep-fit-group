@@ -20,6 +20,8 @@ public interface IAlgorithm {
 
     void createFile(String fileName);
 
+    String getName();
+
     AccelerationData getAccelerationData();
 
 }

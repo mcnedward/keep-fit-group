@@ -1,7 +1,6 @@
 package com.keepfit.stepdetection.algorithms.kornel;
 
 import android.content.Context;
-import android.util.Log;
 
 import com.keepfit.stepdetection.algorithms.AccelerationData;
 import com.keepfit.stepdetection.algorithms.BaseAlgorithm;
@@ -14,24 +13,29 @@ import java.util.List;
  */
 public class KornelAlgorithm extends BaseAlgorithm {
 
+    private static String NAME = "Kornel Algorithm";
+
     private int stepsCounted;
     private int overallSteps;
-    private long timeWindow = 50000000;
+    private long timeWindow = 5000;
     List<AccelerationData> buffer = new ArrayList<>();
     private AccelerationData cachedData;
 
     public KornelAlgorithm(Context context) {
-        super(context);
+        super(context, NAME);
+        cachedData = new AccelerationData(0, 0, 0, 0);
+    }
+
+    public KornelAlgorithm() {
+        super(NAME);
         cachedData = new AccelerationData(0, 0, 0, 0);
     }
 
     @Override
-    public void handleSensorData(AccelerationData data){
-        writeSensorData(data);
+    public void handleSensorData(AccelerationData data) {
         buffer.add(data);
-        if(timeWindow < (buffer.get(buffer.size()-1).getTimeStamp() - buffer.get(0).getTimeStamp())){
+        if (timeWindow < (buffer.get(buffer.size() - 1).getTimeStamp() - buffer.get(0).getTimeStamp())) {
             handleSensorData(buffer);
-            Log.i("BUFFER_SIZE", "SIZE: " + buffer.size());
             buffer.clear();
         }
     }
@@ -82,11 +86,9 @@ public class KornelAlgorithm extends BaseAlgorithm {
                 if ((minTimeBetweenSteps < adList.get(k).getTimeStamp() - lastStepFoundTimeStamp)) {
                     stepCount++;
                     lastStepFoundTimeStamp = adList.get(k).getTimeStamp();
-                    System.out.println(adList.get(k).getTimeStamp());
                 }
             }
             cachedData = adList.get(k);
-            writeSensorData(adList.get(k), threshold);
         }
         return stepCount;
     }

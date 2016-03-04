@@ -19,6 +19,8 @@ import java.util.List;
 public class EdwardAlgorithm extends BaseAlgorithm {
     private final static String TAG = "EdwardAlgorithm";
 
+    private static String NAME = "Edward Algorithm";
+
     private final static double GRAVITY_1_G = 9.8;
     private final static double THRESHOLD = 0.14;
 
@@ -33,14 +35,14 @@ public class EdwardAlgorithm extends BaseAlgorithm {
     private long timestamp;
 
     public EdwardAlgorithm(Context context) {
-        super(context);
+        super(context, NAME);
         xValues = new double[3];
         yValues = new double[3];
         zValues = new double[3];
     }
 
     public EdwardAlgorithm() {
-        super(null);
+        super(NAME);
         xValues = new double[3];
         yValues = new double[3];
         zValues = new double[3];

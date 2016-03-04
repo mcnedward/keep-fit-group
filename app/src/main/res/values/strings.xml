@@ -12,7 +12,7 @@
     <string name="gathering">Gathering data for supported sensors...</string>
     <string name="enter_email">Enter email</string>
     <string name="email">Email</string>
-    <string name="name_here">Name Here</string>
+    <string name="name_here">Email File Name Here</string>
     <string name="movementDetectedText">Movement Detected</string>
     <string name="selectSensorSectionHeading">Select Sensor</string>
     <string name="accelerometerLabel">Accelerometer</string>
@@ -40,7 +40,7 @@
     <string name="chris_algorithm">Chris Algorithm</string>
 
     <!-- Result View -->
-    <string name="author">Author:</string>
+    <string name="name">Author:</string>
     <string name="mode">Mode:</string>
     <string name="orientation">Orientation:</string>
     <string name="run">Run:</string>
@@ -49,4 +49,5 @@
     <string name="counted_steps">Counted Steps:</string>
     <string name="placeholder">Empty</string>
     <string name="number_placeholder">1</string>
+    <string name="loading">RUNNING ALGORITHMS!</string>
 </resources>

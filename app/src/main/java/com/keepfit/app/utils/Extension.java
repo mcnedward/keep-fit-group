@@ -36,11 +36,11 @@ public class Extension {
         context.startActivity(Intent.createChooser(intent, "Sending email..."));
     }
 
-    public static DataFile handleReader(BufferedReader reader, String fileName) throws IOException {
-        DataFile dataFile = new DataFile();
+    public static DataFile handleReader(BufferedReader reader, int numberOfRealSteps) throws IOException {
+        DataFile dataFile = new DataFile(numberOfRealSteps);
         List<AccelerationData> data = new ArrayList<>();
 
-        String line = null;
+        String line;
         int lineNumber = 1;
         boolean skip = false;
         while ((line = reader.readLine()) != null) {

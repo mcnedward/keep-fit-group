@@ -1,6 +1,7 @@
 package com.keepfit.app.utils;
 
 import com.keepfit.stepdetection.algorithms.AccelerationData;
+import com.keepfit.stepdetection.algorithms.IAlgorithm;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,9 +12,17 @@ import java.util.List;
 public class DataFile {
 
     private List<AccelerationData> data;
+    private List<IAlgorithm> algorithms;
+    private int numberOfRealSteps;
 
-    public DataFile() {
+    public DataFile(int numberOfRealSteps) {
+        this.numberOfRealSteps = numberOfRealSteps;
         data = new ArrayList<>();
+        algorithms = new ArrayList<>();
+    }
+
+    public void addAlgorithm(IAlgorithm algorithm) {
+        algorithms.add(algorithm);
     }
 
     /**
@@ -30,4 +39,19 @@ public class DataFile {
         this.data = data;
     }
 
+    public List<IAlgorithm> getAlgorithms() {
+        return algorithms;
+    }
+
+    public void setAlgorithms(List<IAlgorithm> algorithms) {
+        this.algorithms = algorithms;
+    }
+
+    public int getNumberOfRealSteps() {
+        return numberOfRealSteps;
+    }
+
+    public void setNumberOfRealSteps(int numberOfRealSteps) {
+        this.numberOfRealSteps = numberOfRealSteps;
+    }
 }
