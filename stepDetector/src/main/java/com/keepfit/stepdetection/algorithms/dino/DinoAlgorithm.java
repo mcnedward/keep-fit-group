@@ -27,17 +27,6 @@ public class DinoAlgorithm extends BaseAlgorithm {
         calculateSteps(ad);
     }
 
-    @Override
-    public void notifySensorDataReceived(AccelerationData ad) {
-        calculateSteps(ad);
-    }
-
-    @Override
-    public void notifySensorDataReceived(List<AccelerationData> adList) {
-        for (AccelerationData ad : adList) {
-            calculateSteps(ad);
-        }
-    }
     //threshold formula is th = (a/(i-k)) + b
 
     private double threshold;
@@ -115,8 +104,4 @@ public class DinoAlgorithm extends BaseAlgorithm {
         }
     }
 
-    @Override
-    public AccelerationData getAccelerationData() {
-        return new AccelerationData(0, 0, accZi, 0);
-    }
 }

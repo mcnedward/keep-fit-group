@@ -2,13 +2,23 @@ package com.keepfit.app.view;
 
 import android.content.Context;
 import android.graphics.Color;
+import android.graphics.Paint;
 import android.support.v4.content.ContextCompat;
 import android.util.AttributeSet;
 import android.util.Pair;
+import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.SeekBar;
 
+import com.androidplot.ui.AnchorPosition;
+import com.androidplot.ui.PositionMetrics;
 import com.androidplot.ui.SeriesRenderer;
+import com.androidplot.ui.SizeLayoutType;
+import com.androidplot.ui.SizeMetrics;
+import com.androidplot.ui.TextOrientationType;
+import com.androidplot.ui.XLayoutStyle;
+import com.androidplot.ui.YLayoutStyle;
+import com.androidplot.util.PixelUtils;
 import com.androidplot.xy.BarFormatter;
 import com.androidplot.xy.BarRenderer;
 import com.androidplot.xy.BoundaryMode;
@@ -21,6 +31,7 @@ import com.keepfit.app.utils.DataFile;
 import com.keepfit.stepdetection.algorithms.IAlgorithm;
 import com.keepfit.stepdetection.algorithms.chris.ChrisAlgorithm;
 import com.keepfit.stepdetection.algorithms.dino.DinoAlgorithm;
+import com.keepfit.stepdetection.algorithms.edward.EdwardAlgorithm;
 import com.keepfit.stepdetection.algorithms.kornel.KornelAlgorithm;
 
 import java.text.FieldPosition;
@@ -39,12 +50,14 @@ public class ResultView extends LinearLayout {
 
     private XYPlot plot;
     private XYSeries seriesReal;
+    private XYSeries seriesEdward;
     private XYSeries seriesDino;
     private XYSeries seriesKornel;
     private XYSeries seriesChris;
     private Pair<Integer, XYSeries> selection;
     private MyBarFormatter selectionFormatter;
     private MyBarFormatter formatterReal;
+    private MyBarFormatter formatterEdward;
     private MyBarFormatter formatterDino;
     private MyBarFormatter formatterKornel;
     private MyBarFormatter formatterChris;
@@ -72,14 +85,16 @@ public class ResultView extends LinearLayout {
         plot.setTicksPerDomainLabel(5);
         plot.setRangeLowerBoundary(0, BoundaryMode.FIXED);
         plot.setRangeStep(XYStepMode.INCREMENT_BY_VAL, 2);
+        plot.getLegendWidget().setSize(new SizeMetrics(15, SizeLayoutType.ABSOLUTE, 500, SizeLayoutType.ABSOLUTE));
     }
 
     private void initializePlot() {
         plot = (XYPlot) findViewById(R.id.data_plot);
         formatterReal = new MyBarFormatter(ContextCompat.getColor(context, R.color.Yellow), Color.LTGRAY);
-        formatterDino = new MyBarFormatter(ContextCompat.getColor(context, R.color.FireBrick), Color.LTGRAY);
+        formatterEdward = new MyBarFormatter(ContextCompat.getColor(context, R.color.FireBrick), Color.LTGRAY);
+        formatterDino = new MyBarFormatter(ContextCompat.getColor(context, R.color.DodgerBlue), Color.LTGRAY);
         formatterKornel = new MyBarFormatter(ContextCompat.getColor(context, R.color.LimeGreen), Color.LTGRAY);
-        formatterChris = new MyBarFormatter(ContextCompat.getColor(context, R.color.DodgerBlue), Color.LTGRAY);
+        formatterChris = new MyBarFormatter(ContextCompat.getColor(context, R.color.DarkMagenta), Color.LTGRAY);
         selectionFormatter = new MyBarFormatter(Color.YELLOW, Color.WHITE);
 
         if (dataFiles != null)
@@ -131,12 +146,14 @@ public class ResultView extends LinearLayout {
 
         // Setup our Series with the selected number of elements
         seriesReal = new SimpleXYSeries(realSteps, SimpleXYSeries.ArrayFormat.Y_VALS_ONLY, "Real Steps");
+        seriesEdward = new SimpleXYSeries(edwardSteps, SimpleXYSeries.ArrayFormat.Y_VALS_ONLY, "Edward Steps");
         seriesDino = new SimpleXYSeries(dinoSteps, SimpleXYSeries.ArrayFormat.Y_VALS_ONLY, "Dino Steps");
         seriesKornel = new SimpleXYSeries(kornelSteps, SimpleXYSeries.ArrayFormat.Y_VALS_ONLY, "Kornel Steps");
         seriesChris = new SimpleXYSeries(chrisSteps, SimpleXYSeries.ArrayFormat.Y_VALS_ONLY, "Chris Steps");
 
         // add a new series' to the xyplot:
         plot.addSeries(seriesReal, formatterReal);
+        plot.addSeries(seriesEdward, formatterEdward);
         plot.addSeries(seriesDino, formatterDino);
         plot.addSeries(seriesKornel, formatterKornel);
         plot.addSeries(seriesChris, formatterChris);
@@ -154,21 +171,28 @@ public class ResultView extends LinearLayout {
     }
 
     List<Integer> realSteps;
+    List<Integer> edwardSteps;
     List<Integer> dinoSteps;
     List<Integer> kornelSteps;
     List<Integer> chrisSteps;
     private void getDataToPlot() {
         realSteps = new ArrayList<>();
+        edwardSteps = new ArrayList<>();
         dinoSteps = new ArrayList<>();
         kornelSteps = new ArrayList<>();
         chrisSteps = new ArrayList<>();
         realSteps.add(0);
+        edwardSteps.add(0);
         dinoSteps.add(0);
         kornelSteps.add(0);
         chrisSteps.add(0);
         for (DataFile file : dataFiles) {
             realSteps.add(file.getNumberOfRealSteps());
             for (IAlgorithm algorithm : file.getAlgorithms()) {
+                if (algorithm instanceof EdwardAlgorithm) {
+                    edwardSteps.add(algorithm.getStepCount());
+                    continue;
+                }
                 if (algorithm instanceof DinoAlgorithm) {
                     dinoSteps.add(algorithm.getStepCount());
                     continue;
@@ -184,6 +208,7 @@ public class ResultView extends LinearLayout {
             }
         }
         realSteps.add(0);
+        edwardSteps.add(0);
         dinoSteps.add(0);
         kornelSteps.add(0);
         chrisSteps.add(0);

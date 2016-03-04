@@ -54,7 +54,8 @@ public class EdwardAlgorithm extends BaseAlgorithm {
     public void handleSensorData(AccelerationData ad) {
         writeSensorData(ad);
         notifyAccelerometerSensorChanged(ad.getTimeStamp(), ad.getX(), ad.getY(), ad.getZ(), ad.getAcceleration());
-//        handleGravitySensorData(accelerationDataList.get(dataIndex++));
+        if (!handlingGravity)
+            notifyGravitySensorChanged(ad.getTimeStamp(), ad.getX(), ad.getY(), ad.getZ());
     }
 
     private void notifyAccelerometerSensorChanged(long eventTime, double xAcceleration, double yAcceleration, double zAcceleration, double acceleration) {
@@ -70,8 +71,10 @@ public class EdwardAlgorithm extends BaseAlgorithm {
         timestamp = eventTime;
     }
 
+    private boolean handlingGravity;
     public void handleGravitySensorData(AccelerationData ad) {
         writeSensorData(ad);
+        handlingGravity = true;
         notifyGravitySensorChanged(ad.getTimeStamp(), ad.getX(), ad.getY(), ad.getZ());
     }
 
@@ -86,8 +89,8 @@ public class EdwardAlgorithm extends BaseAlgorithm {
     private boolean waitFor0;
 
     private void notifyGravitySensorChanged(long eventTime, double xGravity, double yGravity, double zGravity) {
-        currentXGravity = -2;
-        currentYGravity = -2;
+        currentXGravity = handlingGravity ? -2 : xGravity;
+        currentYGravity = handlingGravity ? -2 : yGravity;
         currentZGravity = zGravity;
         double inclinationAngle = calculateInclinationAngle(zGravity);
 

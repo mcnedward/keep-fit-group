@@ -30,6 +30,7 @@ public abstract class BaseAlgorithm implements IAlgorithm {
     private boolean runAlgorithm;   // Boolean to determine whether the algorithm should be run, or if only data should be gathered.
     private boolean writeData;
     private String name;
+    private AccelerationData accelerationData;
 
     public BaseAlgorithm(Context context) {
         this(context, "BaseAlgorithm");
@@ -50,6 +51,7 @@ public abstract class BaseAlgorithm implements IAlgorithm {
 
     @Override
     public void notifySensorDataReceived(AccelerationData ad) {
+        accelerationData = ad;
         double acceleration = ad.getAcceleration();
         if (writeData) {
             ad.setAcceleration(acceleration);
@@ -126,5 +128,10 @@ public abstract class BaseAlgorithm implements IAlgorithm {
     @Override
     public void shouldRunAlgorithm(boolean runAlgorithm) {
         this.runAlgorithm = runAlgorithm;
+    }
+
+    @Override
+    public AccelerationData getAccelerationData() {
+        return accelerationData;
     }
 }

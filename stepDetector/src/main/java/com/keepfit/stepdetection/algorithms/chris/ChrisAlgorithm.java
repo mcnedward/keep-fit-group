@@ -245,14 +245,4 @@ public class ChrisAlgorithm extends BaseAlgorithm {
             return false;
     }
 
-    @Override
-    public AccelerationData getAccelerationData() {
-        if (fData.size() > 0) {
-            return new AccelerationData(0, 0,
-                    fData.get(fData.size() - 1).getStepData(),
-                    fData.get(fData.size() - 1).getTime());
-        } else {
-            return new AccelerationData(0, 0, 0, 0);
-        }
-    }
 }

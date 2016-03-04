@@ -98,9 +98,4 @@ public class KornelAlgorithm extends BaseAlgorithm {
         return overallSteps;
     }
 
-    @Override
-    public AccelerationData getAccelerationData() {
-        return cachedData;
-    }
-
 }

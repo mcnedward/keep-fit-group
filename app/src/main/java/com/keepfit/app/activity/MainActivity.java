@@ -16,9 +16,6 @@ import android.view.WindowManager;
 
 import com.keepfit.app.R;
 import com.keepfit.app.activity.fragment.BaseFragment;
-import com.keepfit.app.activity.fragment.PreferenceFrag;
-
-import java.util.prefs.Preferences;
 
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
@@ -59,11 +56,8 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.action_settings: {
-                Intent intent = new Intent(this, Preferences.class);
-                intent.putExtra(MyPreferenceActivity.EXTRA_SHOW_FRAGMENT, PreferenceFrag.class.getName());
-                intent.putExtra(MyPreferenceActivity.EXTRA_NO_HEADERS, true);
-                intent.setClassName(this, "com.keepfit.app.activity.MyPreferenceActivity");
+            case R.id.action_info: {
+                Intent intent = new Intent(this, InfoActivity.class);
                 startActivity(intent);
                 return true;
             }

@@ -39,7 +39,7 @@ public class DataFolderLoader extends AsyncTaskLoader<List<DataFolder>> {
         DinoAlgorithm dinoAlgorithm = new DinoAlgorithm();
         KornelAlgorithm kornelAlgorithm = new KornelAlgorithm();
         ChrisAlgorithm chrisAlgorithm = new ChrisAlgorithm();
-        // algorithms.add(edwardAlgorithm);
+        algorithms.add(edwardAlgorithm);
         algorithms.add(dinoAlgorithm);
         algorithms.add(kornelAlgorithm);
         algorithms.add(chrisAlgorithm);
