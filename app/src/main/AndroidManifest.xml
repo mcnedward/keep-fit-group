@@ -22,7 +22,6 @@
             android:name=".activity.MyPreferenceActivity"
             android:label="Preferences">
         </activity>
-        <activity android:name=".activity.SupportedSensorsActivity"/>
 
     </application>
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />

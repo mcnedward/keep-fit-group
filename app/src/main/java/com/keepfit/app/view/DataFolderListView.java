@@ -18,6 +18,7 @@ public class DataFolderListView extends LinearLayout {
     private TextView txtAuthor;
     private TextView txtMode;
     private TextView txtOrientation;
+    private TextView txtSteps;
 
     public DataFolderListView(DataFolder dataFolder, Context context) {
         super(context);
@@ -31,6 +32,7 @@ public class DataFolderListView extends LinearLayout {
         txtAuthor = (TextView) findViewById(R.id.text_author);
         txtMode = (TextView) findViewById(R.id.text_mode);
         txtOrientation = (TextView) findViewById(R.id.text_orientation);
+        txtSteps = (TextView) findViewById(R.id.text_steps);
         update(dataFolder);
     }
 
@@ -38,6 +40,7 @@ public class DataFolderListView extends LinearLayout {
         txtAuthor.setText(dataFolder.getAuthor());
         txtMode.setText(dataFolder.getMode());
         txtOrientation.setText(dataFolder.getOrientation());
+        txtSteps.setText(String.valueOf(dataFolder.getNumberOfSteps()));
     }
 
 }

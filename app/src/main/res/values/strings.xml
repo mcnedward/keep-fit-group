@@ -43,7 +43,6 @@
     <string name="name">Author:</string>
     <string name="mode">Mode:</string>
     <string name="orientation">Orientation:</string>
-    <string name="run">Run:</string>
     <string name="algorithm">Algorithm:</string>
     <string name="real_steps">Real Steps:</string>
     <string name="counted_steps">Counted Steps:</string>

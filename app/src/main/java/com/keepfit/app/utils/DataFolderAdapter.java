@@ -2,7 +2,6 @@ package com.keepfit.app.utils;
 
 import android.content.Context;
 import android.graphics.Typeface;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,7 +24,7 @@ public class DataFolderAdapter extends BaseExpandableListAdapter {
     private Context context;
 
     private List<DataFolder> groups;
-    private List<List<DataFile>> children;
+    private List<List<List<DataFile>>> children;
 
     public DataFolderAdapter(List<DataFolder> groups, Context context) {
         this.context = context;
@@ -66,16 +65,16 @@ public class DataFolderAdapter extends BaseExpandableListAdapter {
 
     @Override
     public View getChildView(int groupPosition, int childPosition, boolean isLastChild, View convertView, ViewGroup parent) {
-        if (convertView == null) {
-            convertView = new ResultView(getChild(groupPosition, childPosition), context);
-        }
-        return convertView;
+        return new ResultView(getChild(groupPosition, childPosition), context);
     }
 
     public void setGroups(List<DataFolder> groups) {
         this.groups = groups;
         for (DataFolder folder : groups) {
-            children.add(folder.getFiles());
+            List<DataFile> files = folder.getFiles();
+            List<List<DataFile>> l = new ArrayList<>();
+            l.add(files);
+            children.add(l);
         }
         notifyDataSetChanged();
     }
@@ -105,7 +104,7 @@ public class DataFolderAdapter extends BaseExpandableListAdapter {
     }
 
     @Override
-    public DataFile getChild(int groupPosition, int childPosition) {
+    public List<DataFile> getChild(int groupPosition, int childPosition) {
         return children.get(groupPosition).get(childPosition);
     }
 
