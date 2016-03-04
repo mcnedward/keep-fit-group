@@ -58,7 +58,8 @@ public class DinoAlgorithm extends BaseAlgorithm {
         return this.steps;
     }
 
-    public void calculateSteps(AccelerationData ad ){
+    public void calculateSteps(AccelerationData ad ) {
+        writeSensorData(ad);
         //start
         if(!dataStreamStart) { //if this is our first sample
             //k = sample number of sample where start point of walking is detected

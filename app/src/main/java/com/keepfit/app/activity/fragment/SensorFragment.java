@@ -78,15 +78,17 @@ public class SensorFragment extends BaseFragment {
 
     public void emailDataFiles() {
         List<File> dataFiles = new ArrayList<>();
-        for (Holder holder : holders) {
-            if (holder.hasSensor) {
-                List<IAlgorithm> algorithms = holder.stepDetector.getAlgorithms();
-                for (IAlgorithm algorithm : algorithms) {
-                    dataFiles.add(algorithm.getDataFile());
+        if (holders != null) {
+            for (Holder holder : holders) {
+                if (holder.hasSensor) {
+                    List<IAlgorithm> algorithms = holder.stepDetector.getAlgorithms();
+                    for (IAlgorithm algorithm : algorithms) {
+                        dataFiles.add(algorithm.getDataFile());
+                    }
                 }
             }
+            Extension.emailDataFile(context, dataFiles, toEmails.toArray(new String[toEmails.size()]));
         }
-        Extension.emailDataFile(context, dataFiles, toEmails.toArray(new String[toEmails.size()]));
     }
 
     private void initializeAlgorithmHolders() {
@@ -96,22 +98,22 @@ public class SensorFragment extends BaseFragment {
         detector1.registerAlgorithm(new DataGatherAlgorithm(context, "Accelerometer"));
         Holder holder1 = new Holder(detector1, Sensor.TYPE_ACCELEROMETER);
 
-        IStepDetector detector2 = new StepDetector(context);
-        detector2.registerAlgorithm(new DataGatherAlgorithm(context, "Linear Accelerometer"));
-        Holder holder2 = new Holder(detector2, Sensor.TYPE_LINEAR_ACCELERATION);
+//        IStepDetector detector2 = new StepDetector(context);
+//        detector2.registerAlgorithm(new DataGatherAlgorithm(context, "Linear Accelerometer"));
+//        Holder holder2 = new Holder(detector2, Sensor.TYPE_LINEAR_ACCELERATION);
 
         IStepDetector detector3 = new StepDetector(context);
         detector3.registerAlgorithm(new DataGatherAlgorithm(context, "Gravity"));
         Holder holder3 = new Holder(detector3, Sensor.TYPE_GRAVITY);
 
-        IStepDetector detector4 = new StepDetector(context);
-        detector4.registerAlgorithm(new DataGatherAlgorithm(context, "Gyroscope"));
-        Holder holder4 = new Holder(detector4, Sensor.TYPE_GYROSCOPE);
+//        IStepDetector detector4 = new StepDetector(context);
+//        detector4.registerAlgorithm(new DataGatherAlgorithm(context, "Gyroscope"));
+//        Holder holder4 = new Holder(detector4, Sensor.TYPE_GYROSCOPE);
 
         holders.add(holder1);
-        holders.add(holder2);
+//        holders.add(holder2);
         holders.add(holder3);
-        holders.add(holder4);
+//        holders.add(holder4);
     }
 
     private void initializeSensors() {
@@ -144,6 +146,7 @@ public class SensorFragment extends BaseFragment {
         btnSendEmail.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                stop();
                 emailDataFiles();
             }
         });

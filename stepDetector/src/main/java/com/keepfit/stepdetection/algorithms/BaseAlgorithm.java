@@ -1,8 +1,7 @@
 package com.keepfit.stepdetection.algorithms;
 
 import android.content.Context;
-import android.content.Intent;
-import android.net.Uri;
+import android.os.Environment;
 import android.util.Log;
 
 import java.io.BufferedWriter;
@@ -35,6 +34,7 @@ public abstract class BaseAlgorithm implements IAlgorithm {
         this.context = context;
         startTime = System.currentTimeMillis();
         runAlgorithm = true;
+        createFile("Edward");
     }
 
     public BaseAlgorithm(Context context, String name) {
@@ -48,8 +48,10 @@ public abstract class BaseAlgorithm implements IAlgorithm {
     @Override
     public void notifySensorDataReceived(AccelerationData ad) {
         double acceleration = ad.getAcceleration();
-        if (writeData)
-            writeSensorData(ad.getTimeStamp(), ad.getX(), ad.getY(), ad.getZ(), acceleration);
+        if (writeData) {
+            ad.setAcceleration(acceleration);
+            writeSensorData(ad);
+        }
         if (runAlgorithm)
             handleSensorData(ad);
     }
@@ -63,13 +65,27 @@ public abstract class BaseAlgorithm implements IAlgorithm {
 
     protected abstract void handleSensorData(AccelerationData ad);
 
-    protected void writeSensorData(long eventTime, double x, double y, double z, double acceleration) {
+    protected void writeSensorData(AccelerationData data) {
         if (printWriter != null) {
-            printWriter.println(String.valueOf((eventTime / MILLISEC_FACTOR) - startTime)
-                    + CSV_DELIM + x
-                    + CSV_DELIM + y
-                    + CSV_DELIM + z
-                    + CSV_DELIM + acceleration);
+            printWriter.println(String.valueOf((data.getTimeStamp() / MILLISEC_FACTOR) - startTime)
+                    + CSV_DELIM + data.getX()
+                    + CSV_DELIM + data.getY()
+                    + CSV_DELIM + data.getZ()
+                    + CSV_DELIM + data.getAcceleration());
+            if (printWriter.checkError()) {
+                Log.e(TAG, "Failed to write sensor event data");
+            }
+        }
+    }
+
+    protected void writeSensorData(AccelerationData data, double threshold) {
+        if (printWriter != null) {
+            printWriter.println(String.valueOf((data.getTimeStamp() / MILLISEC_FACTOR) - startTime)
+                    + CSV_DELIM + data.getX()
+                    + CSV_DELIM + data.getY()
+                    + CSV_DELIM + data.getZ()
+                    + CSV_DELIM + data.getAcceleration()
+                    + CSV_DELIM + threshold);
             if (printWriter.checkError()) {
                 Log.e(TAG, "Failed to write sensor event data");
             }
@@ -80,7 +96,8 @@ public abstract class BaseAlgorithm implements IAlgorithm {
     public void createFile(String fileName) {
         DateFormat df = new SimpleDateFormat("EEE_d_MMM_ yyyy_HHmm");
         String date = df.format(Calendar.getInstance().getTime());
-        dataFile = new File(context.getExternalCacheDir() + String.format("/%s_AlgorithmData_%s_%s.csv", fileName, date, new Random().nextInt(10)));
+        dataFile = new File(context.getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS)
+        + String.format("/%s_AlgorithmData_%s_%s.csv", fileName, date, new Random().nextInt(10)));
         try {
             dataFile.createNewFile();
             printWriter = new PrintWriter(new BufferedWriter(new FileWriter(dataFile)));

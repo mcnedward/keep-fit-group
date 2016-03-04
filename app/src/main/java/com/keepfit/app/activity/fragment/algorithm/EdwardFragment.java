@@ -14,10 +14,12 @@ public class EdwardFragment extends AlgorithmFragment {
     private static final String TAG = "EdwardFragment";
 
     EdwardAlgorithm edwardAlgorithm;
+    private Context context;
 
     @Override
     protected void initializeAlgorithm(Context context) {
-        edwardAlgorithm = new EdwardAlgorithm(context);
+        this.context = context;
+        createNewAlgorithm();
     }
 
     @Override
@@ -30,6 +32,11 @@ public class EdwardFragment extends AlgorithmFragment {
     @Override
     protected IAlgorithm getAlgorithm() {
         return edwardAlgorithm;
+    }
+
+    @Override
+    public void createNewAlgorithm() {
+        edwardAlgorithm = new EdwardAlgorithm(context);
     }
 
     @Override

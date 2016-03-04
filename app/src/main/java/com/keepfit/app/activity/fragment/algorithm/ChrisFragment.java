@@ -2,9 +2,11 @@ package com.keepfit.app.activity.fragment.algorithm;
 
 import android.content.Context;
 import android.hardware.Sensor;
+import android.support.v4.content.ContextCompat;
 
 import com.keepfit.stepdetection.algorithms.IAlgorithm;
 import com.keepfit.stepdetection.algorithms.chris.ChrisAlgorithm;
+import com.keepfit.stepdetection.algorithms.dino.DinoAlgorithm;
 import com.keepfit.stepdetection.algorithms.edward.EdwardAlgorithm;
 
 /**
@@ -17,7 +19,8 @@ public class ChrisFragment extends AlgorithmFragment {
 
     @Override
     protected void initializeAlgorithm(Context context) {
-        chrisAlgorithm = new ChrisAlgorithm(getContext());
+        this.context = context;
+        chrisAlgorithm = new ChrisAlgorithm(context);
     }
 
     @Override
@@ -33,5 +36,10 @@ public class ChrisFragment extends AlgorithmFragment {
     @Override
     protected String getTitle() {
         return "Chris Algorithm";
+    }
+
+    @Override
+    public void createNewAlgorithm() {
+        chrisAlgorithm = new ChrisAlgorithm(context);
     }
 }

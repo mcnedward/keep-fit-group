@@ -10,7 +10,7 @@ public class AccelerationData {
     private final double x;
     private final double y;
     private final double z;
-    private final Double acceleration;
+    private Double acceleration;
     private final long timeStamp;
     private static AccelerometerFilter filter;
 
@@ -68,6 +68,10 @@ public class AccelerationData {
 
     public double getXYZMagnitude() {
         return Util.magnitude(new double[]{x, y, z});
+    }
+
+    public void setAcceleration(Double acceleration) {
+        this.acceleration = acceleration;
     }
 
     @Override

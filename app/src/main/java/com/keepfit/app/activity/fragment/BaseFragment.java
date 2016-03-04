@@ -14,10 +14,11 @@ public class BaseFragment extends Fragment {
 
     public enum FragmentCode {
         EDWARD(1, "Edward"),
-        KORNEL(2, "Kornel"),
-        DINO(3, "Dino"),
+        DINO(2, "Dino"),
+        KORNEL(3, "Kornel"),
         CHRIS(4, "Chris"),
-        SENSORS(5, "Sensors");
+        RESULTS(5, "Results"),
+        SENSORS(6, "Sensors");
         int id;
         String title;
         FragmentCode(int id, String title) {
@@ -34,14 +35,16 @@ public class BaseFragment extends Fragment {
 
     public static BaseFragment newInstance(FragmentCode code) {
         switch (code) {
+            case DINO:
+                return new DinoFragment();
             case EDWARD:
                 return new EdwardFragment();
             case KORNEL:
                 return new KornelFragment();
-            case DINO:
-                return new DinoFragment();
             case CHRIS:
                 return new ChrisFragment();
+            case RESULTS:
+                return new ResultsFragment();
             case SENSORS:
                 return new SensorFragment();
         }

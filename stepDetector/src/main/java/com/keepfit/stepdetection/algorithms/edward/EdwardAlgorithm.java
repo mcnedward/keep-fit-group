@@ -37,8 +37,6 @@ public class EdwardAlgorithm extends BaseAlgorithm {
         xValues = new double[3];
         yValues = new double[3];
         zValues = new double[3];
-        createFile("Edward");
-        loadGravityData();
     }
 
     public EdwardAlgorithm() {
@@ -46,16 +44,14 @@ public class EdwardAlgorithm extends BaseAlgorithm {
         xValues = new double[3];
         yValues = new double[3];
         zValues = new double[3];
-        loadGravityData();
     }
 
     private int dataIndex = 0;
 
     @Override
     public void handleSensorData(AccelerationData ad) {
+        writeSensorData(ad);
         notifyAccelerometerSensorChanged(ad.getTimeStamp(), ad.getX(), ad.getY(), ad.getZ(), ad.getAcceleration());
-        if (dataIndex == accelerationDataList.size())
-            dataIndex = 0;
 //        handleGravitySensorData(accelerationDataList.get(dataIndex++));
     }
 
@@ -73,6 +69,7 @@ public class EdwardAlgorithm extends BaseAlgorithm {
     }
 
     public void handleGravitySensorData(AccelerationData ad) {
+        writeSensorData(ad);
         notifyGravitySensorChanged(ad.getTimeStamp(), ad.getX(), ad.getY(), ad.getZ());
     }
 
@@ -118,8 +115,6 @@ public class EdwardAlgorithm extends BaseAlgorithm {
                 }
             }
         }
-
-        writeSensorData(eventTime, xGravity, yGravity, zGravity, 0);
     }
 
     private double calculate3PointAverage(double[] values) {
@@ -199,7 +194,7 @@ public class EdwardAlgorithm extends BaseAlgorithm {
     }
 
     private boolean hasHalfSecondPassed(long timer) {
-        return (System.nanoTime() - timer) >= HALF_SECOND;
+        return ((System.nanoTime() / 10) - (timer / 10)) >= HALF_SECOND;
     }
 
     private double getGravityDirectionAccelerationForAxis(double gravityComponent, double acceleration) {
@@ -243,23 +238,6 @@ public class EdwardAlgorithm extends BaseAlgorithm {
 
     public AccelerationData getAccelerationData() {
         return new AccelerationData(currentXGravity, currentYGravity, currentZGravity, timestamp);
-    }
-
-    private void loadGravityData() {
-        accelerationDataList = new ArrayList<>();
-        try {
-            InputStream stream = context.getResources().getAssets().open("gravityZ.csv");
-            BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
-            String line;
-            while ((line = reader.readLine()) != null) {
-                AccelerationData accelerationData = new AccelerationData(0, 0, Double.parseDouble(line), 0.0, 0);
-                accelerationDataList.add(accelerationData);
-            }
-            reader.close();
-            stream.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
     }
 
 }

@@ -10,6 +10,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.TextView;
 
 import com.androidplot.xy.BoundaryMode;
 import com.androidplot.xy.LineAndPointFormatter;
@@ -38,7 +40,7 @@ import java.util.List;
 public abstract class AlgorithmFragment extends BaseFragment {
     private static final String TAG = "AlgorithmFragment";
 
-    private Context context;
+    protected Context context;
     protected static final int RATE = 10000;
     protected SensorManager sensorManager;
     protected IStepDetector stepDetector;
@@ -47,6 +49,7 @@ public abstract class AlgorithmFragment extends BaseFragment {
     // Algorithms
     protected IAlgorithm algorithm;
     private AlgorithmView algorithmView;
+    private EditText algorithmName;
     // XY Plot
     private XYPlot xyPlot;
     private static final String X_LABEL = "Elapsed Time (microseconds)";
@@ -87,6 +90,7 @@ public abstract class AlgorithmFragment extends BaseFragment {
         stepDetector = new StepDetector(context);
         algorithm = getAlgorithm();
         stepDetector.registerAlgorithm(algorithm);
+        algorithmName = (EditText) view.findViewById(R.id.algorithm_email_name);
 
         sensorManager = (SensorManager) context.getSystemService(context.SENSOR_SERVICE);
 
@@ -99,6 +103,9 @@ public abstract class AlgorithmFragment extends BaseFragment {
                     runningAlgorithm = true;
                     ((Button) v).setText(getResources().getString(R.string.stop));
                     startAlgorithm();
+                    String name = algorithmName.getText().toString();
+                    if (name.equals(""))
+                        name = "NeedsAName";
 
                     xyPlot.setTitle(getTitle());
 
@@ -110,6 +117,14 @@ public abstract class AlgorithmFragment extends BaseFragment {
                 }
             }
         });
+
+        algorithmView.setRefreshButtonOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                createNewAlgorithm();
+            }
+        });
+
         algorithmView.setEmailButtonOnClickListener();
         algorithmView.setTitle(getTitle());
 
@@ -148,6 +163,8 @@ public abstract class AlgorithmFragment extends BaseFragment {
     protected abstract IAlgorithm getAlgorithm();
 
     protected abstract String getTitle();
+
+    public abstract void createNewAlgorithm();
 
     private void stopAlgorithm() {
         sensorManager.unregisterListener(stepDetector);

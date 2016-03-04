@@ -12,19 +12,17 @@ import java.util.List;
  * Created by Chris on 01/03/2016.
  */
 
-enum Axis
-{
+enum Axis {
     X, Y, Z
 };
 
-enum Mode
-{
+enum Mode {
     POCKET, HAND
 };
 
 
 public class ChrisAlgorithm extends BaseAlgorithm {
-    private static final boolean DEBUG = true;
+    private static final boolean DEBUG = false;
     public final static double GRAVITY_MS2 = 9.80665;
     private Axis modeAxis = Axis.Y; // Y in pocket mode
     Mode mode = Mode.POCKET;
@@ -49,7 +47,7 @@ public class ChrisAlgorithm extends BaseAlgorithm {
     private static final double P0_POCKET = 1d;
 
     // Kalman data
-    List<Double []> kalman;
+    List<Double[]> kalman;
     int Xk_idx = 0;
     int Pk_idx = 1;
 
@@ -63,36 +61,33 @@ public class ChrisAlgorithm extends BaseAlgorithm {
     private double aMax = 0d;
 
 
-
-    public List<FilterData> getFilterData()
-    {
+    public List<FilterData> getFilterData() {
         return fData;
     }
 
-    public ChrisAlgorithm(Context context)
-    {
+    public ChrisAlgorithm(Context context) {
         super(context);
         kalman = new ArrayList<Double[]>();
         fData = new ArrayList<>();
 
         // k=0
-        Double [] k0 = new Double [] {Z0_POCKET, P0_POCKET};
+        Double[] k0 = new Double[]{Z0_POCKET, P0_POCKET};
         kalman.add(k0);
         // (long time, double raw, double kalmanFiltered, double algoFiltered, double stepData, double devA, double devB
         fData.add(new FilterData(0, k0[Xk_idx], k0[Xk_idx], 0d, 0d, 0d, 0d));
         resetSlope();
     }
 
-    public void handleSensorData(AccelerationData ad)
-    {
-        if(halfFrequency && skip == true)
-        {
+    @Override
+    public void handleSensorData(AccelerationData ad) {
+        writeSensorData(ad);
+        if (halfFrequency && skip == true) {
             skip = false;
             return;
         }
 
         rawData = ad;
-        Double [] kLast = kalman.get(kalman.size()-1);
+        Double[] kLast = kalman.get(kalman.size() - 1);
 
         ///////// Time Update (Predict) //////////////////
         // Get Xkprime
@@ -111,7 +106,7 @@ public class ChrisAlgorithm extends BaseAlgorithm {
         Double Pk = (1 - Kk) * Pkprime;
         //////////////////////////////////////////////////
 
-        kalman.add(new Double [] {Xk, Pk});
+        kalman.add(new Double[]{Xk, Pk});
 
 
         long time = ad.getTimeStamp();
@@ -122,61 +117,57 @@ public class ChrisAlgorithm extends BaseAlgorithm {
         double deviationA = 0;
         double deviationB = 0;
         // Algorithm Filter
-        if(fData.size() > 0)
-        {
+        if (fData.size() > 0) {
             // Previous
-            double lastKfiltered = fData.get(fData.size()-1).getKalmanFiltered();
-            double lastAfiltered = fData.get(fData.size()-1).getAlgoFiltered();
+            double lastKfiltered = fData.get(fData.size() - 1).getKalmanFiltered();
+            double lastAfiltered = fData.get(fData.size() - 1).getAlgoFiltered();
             double threshold = getThreshold();
             deviationA = kFiltered - lastKfiltered;
             deviationB = lastKfiltered - kFiltered;
 
-            if(deviationA > maxDevA)
+            if (deviationA > maxDevA)
                 maxDevA = deviationA;
 
-            if(deviationB > maxDevB)
+            if (deviationB > maxDevB)
                 maxDevB = deviationB;
 
-            if(deviationA > threshold){
+            if (deviationA > threshold) {
                 aFiltered = lastAfiltered + K_MARKUP_A;
             }
-            if(deviationB > threshold) {
-                if(lastAfiltered == 0) {
+            if (deviationB > threshold) {
+                if (lastAfiltered == 0) {
                     aFiltered = aMax;
                 }
-                if(lastAfiltered > 0) {
+                if (lastAfiltered > 0) {
                     aFiltered = lastAfiltered - K_MARKUP_A;
                 }
-                if(lastAfiltered < 0) {
+                if (lastAfiltered < 0) {
                     aFiltered = 0;
                 }
             }
-            if(Math.abs(lastAfiltered - aFiltered) < threshold){
+            if (Math.abs(lastAfiltered - aFiltered) < threshold) {
                 aFiltered = 0;
             }
 
-            if(aFiltered > aMax)
+            if (aFiltered > aMax)
                 aMax = aFiltered;
 
 
             // Step counter - count pairs of +ve, -ve slopes
-            if(aFiltered > lastAfiltered)
+            if (aFiltered > lastAfiltered)
                 pSlope = true;
-            else if(aFiltered < lastAfiltered)
+            else if (aFiltered < lastAfiltered)
                 nSlope = true;
 
-            if(pSlope == false && nSlope == false) {
+            if (pSlope == false && nSlope == false) {
                 // Do Nothing
-            }
-            else if(pSlope == true && nSlope == false) {
+            } else if (pSlope == true && nSlope == false) {
                 // Do Nothing
-            }
-            else if(pSlope == false && nSlope == true) {
+            } else if (pSlope == false && nSlope == true) {
                 // Do Nothing
-            }
-            else if(pSlope == true && nSlope == true) {
-                if(aFiltered == 0) {
-                    if(hasStepTimePassed(time)) {
+            } else if (pSlope == true && nSlope == true) {
+                if (aFiltered == 0) {
+                    if (hasStepTimePassed(time)) {
                         timeOfLastStep = time;
                         numSteps++;
                         stepData = 1;
@@ -185,8 +176,7 @@ public class ChrisAlgorithm extends BaseAlgorithm {
                 }
             }
 
-            if(DEBUG)
-            {
+            if (DEBUG) {
                 System.out.println(String.format("time:%s\n\traw:%s\n\tkFil:%s\n\taDv:%s\n\tbDv:%s\n",
                         time, raw, kFiltered, deviationA, deviationB));
             }
@@ -196,17 +186,14 @@ public class ChrisAlgorithm extends BaseAlgorithm {
         skip = true;
     }
 
-    private void resetSlope()
-    {
+    private void resetSlope() {
         pSlope = false;
         nSlope = false;
     }
 
-    private double getAxisValue(AccelerationData ad, Axis axis)
-    {
+    private double getAxisValue(AccelerationData ad, Axis axis) {
         double pt = 0d;
-        switch (axis)
-        {
+        switch (axis) {
             case X:
                 pt = ad.getX();
                 break;
@@ -226,10 +213,9 @@ public class ChrisAlgorithm extends BaseAlgorithm {
         return pt / GRAVITY_MS2;
     }
 
-    private double getThreshold(){
+    private double getThreshold() {
         double t = 0d;
-        switch (this.mode)
-        {
+        switch (this.mode) {
             case HAND:
                 t = T_HAND;
                 break;
@@ -245,7 +231,7 @@ public class ChrisAlgorithm extends BaseAlgorithm {
         return t;
     }
 
-    public int getStepCount(){
+    public int getStepCount() {
         return this.numSteps;
     }
 
@@ -253,9 +239,8 @@ public class ChrisAlgorithm extends BaseAlgorithm {
         return rawData;
     }
 
-    private boolean hasStepTimePassed(long timeNow)
-    {
-        if(timeNow - timeOfLastStep >= MIN_TIME_BETWEEN_STEPS)
+    private boolean hasStepTimePassed(long timeNow) {
+        if (timeNow - timeOfLastStep >= MIN_TIME_BETWEEN_STEPS)
             return true;
         else
             return false;

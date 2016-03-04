@@ -29,6 +29,7 @@ public class AlgorithmView extends LinearLayout {
     private TextView txtY;
     private TextView txtZ;
     private TextView txtSteps;
+//    private Button refreshButton;
     private Button startButton;
     private Button emailButton;
     private String title;
@@ -62,6 +63,7 @@ public class AlgorithmView extends LinearLayout {
         txtY = (TextView) findViewById(R.id.txt_y);
         txtZ = (TextView) findViewById(R.id.txt_z);
         txtSteps = (TextView) findViewById(R.id.txt_steps);
+//        refreshButton = (Button) findViewById(R.id.btn_btn_refresh);
         startButton = (Button) findViewById(R.id.btn_algorithm);
         emailButton = (Button) findViewById(R.id.btn_email_algorithm);
         setEmailButtonOnClickListener();
@@ -69,7 +71,10 @@ public class AlgorithmView extends LinearLayout {
 
     public void setStartButtonOnClickListener(OnClickListener listener) {
         startButton.setOnClickListener(listener);
-        algorithm.createFile(title);
+    }
+
+    public void setRefreshButtonOnClickListener(OnClickListener listener) {
+//        refreshButton.setOnClickListener(listener);
     }
 
     public void setEmailButtonOnClickListener() {
