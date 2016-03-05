@@ -14,8 +14,8 @@
             android:id="@+id/title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_centerInParent="true"
             android:layout_alignParentLeft="true"
+            android:layout_centerInParent="true"
             android:padding="10dp"
             android:textSize="16dp"
             android:textStyle="bold" />
@@ -25,20 +25,20 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
-            android:layout_toLeftOf="@+id/btn_email_algorithm"
+            android:layout_toLeftOf="@+id/btn_refresh"
             android:gravity="center"
             android:padding="10dp"
-            android:text="@string/start"/>
+            android:text="@string/start" />
 
         <Button
-            android:id="@+id/btn_email_algorithm"
+            android:id="@+id/btn_refresh"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_centerInParent="true"
             android:layout_alignParentRight="true"
+            android:layout_centerInParent="true"
             android:gravity="center"
             android:padding="10dp"
-            android:text="@string/email"/>
+            android:text="@string/refresh" />
 
     </RelativeLayout>
 
@@ -47,95 +47,103 @@
         android:layout_height="1dp"
         android:background="#111" />
 
-    <RelativeLayout
+
+    <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:paddingLeft="16dp">
+        android:orientation="vertical">
 
-        <TextView
-            android:id="@+id/x_description"
+        <RelativeLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:padding="4dp"
-            android:text="@string/algorithm_x"
-            android:textSize="14dp" />
+            android:paddingLeft="16dp">
 
-        <TextView
-            android:id="@+id/txt_x"
+
+            <TextView
+                android:id="@+id/x_description"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="4dp"
+                android:text="@string/algorithm_x"
+                android:textSize="14dp" />
+
+            <TextView
+                android:id="@+id/txt_x"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_toRightOf="@+id/x_description"
+                android:padding="4dp"
+                android:text="@string/zero" />
+
+        </RelativeLayout>
+
+        <RelativeLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_toRightOf="@+id/x_description"
-            android:padding="4dp"
-            android:text="@string/zero" />
+            android:paddingLeft="16dp">
 
-    </RelativeLayout>
+            <TextView
+                android:id="@+id/y_description"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="4dp"
+                android:text="@string/algorithm_y"
+                android:textSize="14dp" />
 
-    <RelativeLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:paddingLeft="16dp">
+            <TextView
+                android:id="@+id/txt_y"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_toRightOf="@+id/y_description"
+                android:padding="4dp"
+                android:text="@string/zero" />
 
-        <TextView
-            android:id="@+id/y_description"
+        </RelativeLayout>
+
+        <RelativeLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:padding="4dp"
-            android:text="@string/algorithm_y"
-            android:textSize="14dp" />
+            android:paddingLeft="16dp">
 
-        <TextView
-            android:id="@+id/txt_y"
+            <TextView
+                android:id="@+id/z_description"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="4dp"
+                android:text="@string/algorithm_z"
+                android:textSize="14dp" />
+
+            <TextView
+                android:id="@+id/txt_z"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_toRightOf="@+id/z_description"
+                android:padding="4dp"
+                android:text="@string/zero" />
+
+        </RelativeLayout>
+
+        <RelativeLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_toRightOf="@+id/y_description"
-            android:padding="4dp"
-            android:text="@string/zero" />
+            android:paddingLeft="16dp">
 
-    </RelativeLayout>
+            <TextView
+                android:id="@+id/step_description"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="4dp"
+                android:text="@string/steps"
+                android:textSize="14dp" />
 
-    <RelativeLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:paddingLeft="16dp">
+            <TextView
+                android:id="@+id/txt_steps"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_toRightOf="@+id/step_description"
+                android:padding="4dp"
+                android:text="@string/zero" />
 
-        <TextView
-            android:id="@+id/z_description"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:padding="4dp"
-            android:text="@string/algorithm_z"
-            android:textSize="14dp" />
-
-        <TextView
-            android:id="@+id/txt_z"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_toRightOf="@+id/z_description"
-            android:padding="4dp"
-            android:text="@string/zero" />
-
-    </RelativeLayout>
-
-    <RelativeLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:paddingLeft="16dp">
-
-        <TextView
-            android:id="@+id/step_description"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:padding="4dp"
-            android:text="@string/steps"
-            android:textSize="14dp" />
-
-        <TextView
-            android:id="@+id/txt_steps"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_toRightOf="@+id/step_description"
-            android:padding="4dp"
-            android:text="@string/zero" />
-
-    </RelativeLayout>
+        </RelativeLayout>
+    </LinearLayout>
 </LinearLayout>

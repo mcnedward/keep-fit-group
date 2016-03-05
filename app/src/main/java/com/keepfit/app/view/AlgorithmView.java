@@ -29,10 +29,8 @@ public class AlgorithmView extends LinearLayout {
     private TextView txtY;
     private TextView txtZ;
     private TextView txtSteps;
-//    private Button refreshButton;
+    private Button refreshButton;
     private Button startButton;
-    private Button emailButton;
-    private String title;
 
     private IAlgorithm algorithm;
 
@@ -48,13 +46,6 @@ public class AlgorithmView extends LinearLayout {
         this.context = context;
         inflate(context, R.layout.view_algorithm, this);
         initialize();
-//        TypedArray a = context.getTheme().obtainStyledAttributes(attrs, R.styleable.AlgorithmView, 0, 0);
-//        try {
-//            title = a.getString(R.styleable.AlgorithmView_algorithmTitle);
-//            txtTitle.setText(title);
-//        } finally {
-//            a.recycle();
-//        }
     }
 
     private void initialize() {
@@ -63,10 +54,8 @@ public class AlgorithmView extends LinearLayout {
         txtY = (TextView) findViewById(R.id.txt_y);
         txtZ = (TextView) findViewById(R.id.txt_z);
         txtSteps = (TextView) findViewById(R.id.txt_steps);
-//        refreshButton = (Button) findViewById(R.id.btn_btn_refresh);
+        refreshButton = (Button) findViewById(R.id.btn_refresh);
         startButton = (Button) findViewById(R.id.btn_algorithm);
-        emailButton = (Button) findViewById(R.id.btn_email_algorithm);
-        setEmailButtonOnClickListener();
     }
 
     public void setStartButtonOnClickListener(OnClickListener listener) {
@@ -74,23 +63,10 @@ public class AlgorithmView extends LinearLayout {
     }
 
     public void setRefreshButtonOnClickListener(OnClickListener listener) {
-//        refreshButton.setOnClickListener(listener);
-    }
-
-    public void setEmailButtonOnClickListener() {
-        emailButton.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                File dataFile = algorithm.getDataFile();
-                List<File> dataFiles = new ArrayList<>();
-                dataFiles.add(dataFile);
-                Extension.emailDataFile(context, dataFiles, new String[] {"edwardmcn64@gmail.com"});
-            }
-        });
+        refreshButton.setOnClickListener(listener);
     }
 
     public void setTitle(String title) {
-        this.title = title;
         txtTitle.setText(title);
     }
 

@@ -11,7 +11,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.TextView;
 
 import com.androidplot.xy.BoundaryMode;
 import com.androidplot.xy.LineAndPointFormatter;
@@ -20,6 +19,7 @@ import com.androidplot.xy.XYPlot;
 import com.androidplot.xy.XYStepMode;
 import com.keepfit.app.R;
 import com.keepfit.app.activity.fragment.BaseFragment;
+import com.keepfit.app.utils.Extension;
 import com.keepfit.app.view.AlgorithmView;
 import com.keepfit.stepdetection.accelerometer.filter.Constants;
 import com.keepfit.stepdetection.algorithms.AccelerationData;
@@ -28,6 +28,7 @@ import com.keepfit.stepdetection.algorithms.IStepDetector;
 import com.keepfit.stepdetection.algorithms.StepDetector;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -49,7 +50,8 @@ public abstract class AlgorithmFragment extends BaseFragment {
     // Algorithms
     protected IAlgorithm algorithm;
     private AlgorithmView algorithmView;
-    private EditText algorithmName;
+    private EditText algorithmEmailName;
+    private Button emailButton;
     // XY Plot
     private XYPlot xyPlot;
     private static final String X_LABEL = "Elapsed Time (microseconds)";
@@ -61,8 +63,6 @@ public abstract class AlgorithmFragment extends BaseFragment {
     private static final int MILLISEC_FACTOR = 1000000;
     private long startTime;
     private long lastChartRefresh;
-    private float[] gravity;
-    private int highPassCount;
     private SimpleXYSeries xAxisSeries;
     private SimpleXYSeries yAxisSeries;
     private SimpleXYSeries zAxisSeries;
@@ -90,7 +90,8 @@ public abstract class AlgorithmFragment extends BaseFragment {
         stepDetector = new StepDetector(context);
         algorithm = getAlgorithm();
         stepDetector.registerAlgorithm(algorithm);
-        algorithmName = (EditText) view.findViewById(R.id.algorithm_email_name);
+        algorithmEmailName = (EditText) view.findViewById(R.id.algorithm_email_name);
+        emailButton = (Button) view.findViewById(R.id.btn_email);
 
         sensorManager = (SensorManager) context.getSystemService(context.SENSOR_SERVICE);
 
@@ -100,18 +101,9 @@ public abstract class AlgorithmFragment extends BaseFragment {
             @Override
             public void onClick(View v) {
                 if (!runningAlgorithm) {
-                    runningAlgorithm = true;
                     ((Button) v).setText(getResources().getString(R.string.stop));
                     startAlgorithm();
-                    String name = algorithmName.getText().toString();
-                    if (name.equals(""))
-                        name = "NeedsAName";
-
-                    xyPlot.setTitle(getTitle());
-
-                    displayAlgorithmData();
                 } else {
-                    runningAlgorithm = false;
                     ((Button) v).setText(getResources().getString(R.string.start));
                     stopAlgorithm();
                 }
@@ -121,18 +113,18 @@ public abstract class AlgorithmFragment extends BaseFragment {
         algorithmView.setRefreshButtonOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                createNewAlgorithm();
+                refresh();
             }
         });
 
-        algorithmView.setEmailButtonOnClickListener();
+        setEmailButtonOnClickListener();
         algorithmView.setTitle(getTitle());
 
-        initializeXYPlot(view);
+        xyPlot = (XYPlot) view.findViewById(R.id.xy_plot);
+        initializeXYPlot();
     }
 
-    private void initializeXYPlot(View view) {
-        xyPlot = (XYPlot) view.findViewById(R.id.xy_plot);
+    private void initializeXYPlot() {
         xyPlot.setDomainLabel(X_LABEL);
         xyPlot.setRangeLabel(Y_LABEL);
         xyPlot.setBorderPaint(null);
@@ -146,9 +138,7 @@ public abstract class AlgorithmFragment extends BaseFragment {
         zAxisSeries = new SimpleXYSeries("Z Axis");
         accelerationSeries = new SimpleXYSeries("Acceleration");
 
-        gravity = new float[Constants.ACCELEROMETER_VECTOR_SIZE];
         startTime = SystemClock.uptimeMillis();
-        highPassCount = 0;
 
         xyPlot.addSeries(xAxisSeries, new LineAndPointFormatter(Color.RED, Color.RED, Color.TRANSPARENT, null));
         xyPlot.addSeries(yAxisSeries, new LineAndPointFormatter(Color.GREEN, Color.GREEN, Color.TRANSPARENT, null));
@@ -158,17 +148,38 @@ public abstract class AlgorithmFragment extends BaseFragment {
 
     protected abstract void initializeAlgorithm(Context context);
 
-    protected abstract void startAlgorithm();
+    protected abstract void registerAlgorithm();
 
     protected abstract IAlgorithm getAlgorithm();
 
     protected abstract String getTitle();
 
-    public abstract void createNewAlgorithm();
+    public abstract IAlgorithm createNewAlgorithm();
+
+    private void startAlgorithm() {
+        runningAlgorithm = true;
+        String emailName = algorithmEmailName.getText().toString();
+        if (!emailName.equals(""))
+            algorithm.createFile(emailName);
+        registerAlgorithm();
+        displayAlgorithmData();
+        xyPlot.setTitle(getTitle());
+    }
 
     private void stopAlgorithm() {
         sensorManager.unregisterListener(stepDetector);
         sensorManager.flush(stepDetector);
+        runningAlgorithm = false;
+    }
+
+    private void refresh() {
+        xyPlot.clear();
+        xyPlot.clearAnimation();
+        initializeXYPlot();
+        algorithm = createNewAlgorithm();
+        stepDetector.registerAlgorithm(algorithm);
+        algorithmView.setAlgorithm(algorithm);
+        registerAlgorithm();
     }
 
     private void displayAlgorithmData() {
@@ -191,6 +202,18 @@ public abstract class AlgorithmFragment extends BaseFragment {
                 }
             }
         }).start();
+    }
+
+    public void setEmailButtonOnClickListener() {
+        emailButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                File dataFile = algorithm.getDataFile();
+                List<File> dataFiles = new ArrayList<>();
+                dataFiles.add(dataFile);
+                Extension.emailDataFile(context, dataFiles, new String[]{"edwardmcn64@gmail.com"});
+            }
+        });
     }
 
     protected List<AccelerationData> loadFile() {

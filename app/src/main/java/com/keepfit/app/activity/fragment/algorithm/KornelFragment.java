@@ -25,7 +25,7 @@ public class KornelFragment extends AlgorithmFragment {
     }
 
     @Override
-    protected void startAlgorithm() {
+    protected void registerAlgorithm() {
         sensorManager.registerListener(stepDetector, sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER), RATE);
 //        List<AccelerationData> accelerationDataList = loadFile();
 //        kornelAlgorithm.notifySensorDataReceived(accelerationDataList);
@@ -42,8 +42,9 @@ public class KornelFragment extends AlgorithmFragment {
     }
 
     @Override
-    public void createNewAlgorithm() {
+    public KornelAlgorithm createNewAlgorithm() {
         kornelAlgorithm = new KornelAlgorithm(context);
+        return kornelAlgorithm;
     }
 
 }

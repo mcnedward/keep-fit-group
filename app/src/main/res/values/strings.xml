@@ -39,6 +39,7 @@
     <string name="kornel_algorithm">Kornel Algorithm</string>
     <string name="dino_algorithm">Dino Algorithm</string>
     <string name="chris_algorithm">Chris Algorithm</string>
+    <string name="refresh">Refresh</string>
 
     <!-- Result View -->
     <string name="name">Author:</string>

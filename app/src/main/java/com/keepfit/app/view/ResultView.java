@@ -80,7 +80,6 @@ public class ResultView extends LinearLayout {
     }
 
     private void setUpStep() {
-        // reduce the number of range labels
         plot.setTicksPerRangeLabel(4);
         plot.setTicksPerDomainLabel(5);
         plot.setRangeLowerBoundary(0, BoundaryMode.FIXED);

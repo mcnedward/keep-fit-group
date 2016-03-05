@@ -23,7 +23,7 @@ public class EdwardFragment extends AlgorithmFragment {
     }
 
     @Override
-    protected void startAlgorithm() {
+    protected void registerAlgorithm() {
         boolean accelerometerRegistered = sensorManager.registerListener(stepDetector, sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER), RATE);
         boolean gravityRegister = sensorManager.registerListener(stepDetector, sensorManager.getDefaultSensor(Sensor.TYPE_GRAVITY), RATE);
         Log.d(TAG, String.format("Accelerometer Registered? %s; Gravity Registered? %s", accelerometerRegistered, gravityRegister));
@@ -35,8 +35,9 @@ public class EdwardFragment extends AlgorithmFragment {
     }
 
     @Override
-    public void createNewAlgorithm() {
+    public EdwardAlgorithm createNewAlgorithm() {
         edwardAlgorithm = new EdwardAlgorithm(context);
+        return edwardAlgorithm;
     }
 
     @Override

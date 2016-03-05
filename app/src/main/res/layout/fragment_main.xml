@@ -10,16 +10,16 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
-        android:orientation="vertical"
         android:descendantFocusability="beforeDescendants"
-        android:focusableInTouchMode="true">
+        android:focusableInTouchMode="true"
+        android:orientation="vertical">
 
         <com.keepfit.app.view.AlgorithmView
             android:id="@+id/algorithm_view"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingTop="16dp"
-            android:paddingBottom="20dp"/>
+            android:paddingBottom="20dp"
+            android:paddingTop="16dp" />
 
         <com.androidplot.xy.XYPlot
             android:id="@+id/xy_plot"
@@ -27,20 +27,34 @@
             android:layout_width="match_parent"
             android:layout_height="250dp"
             android:layout_marginLeft="5dp"
-            android:layout_marginRight="5dp"/>
+            android:layout_marginRight="5dp" />
 
-        <EditText
-            android:id="@+id/algorithm_email_name"
+        <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="@string/name_here"
-            android:windowSoftInputMode="stateHidden"
-            android:singleLine="true"
-            android:paddingTop="20dp"
-            android:paddingLeft="20dp"
-            android:paddingRight="20dp"/>
-    </LinearLayout>
+            android:orientation="horizontal"
+            android:paddingTop="10dp">
 
+            <EditText
+                android:id="@+id/algorithm_email_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_toLeftOf="@+id/btn_email"
+                android:hint="@string/name_here"
+                android:paddingLeft="10dp"
+                android:paddingRight="20dp"
+                android:paddingTop="20dp"
+                android:singleLine="true"
+                android:windowSoftInputMode="stateHidden" />
+
+            <Button
+                android:id="@+id/btn_email"
+                android:layout_alignParentRight="true"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/email"/>
+        </RelativeLayout>
+    </LinearLayout>
 
 
 </ScrollView>

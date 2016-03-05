@@ -22,7 +22,7 @@ public class EdwardAlgorithm extends BaseAlgorithm {
     private static String NAME = "Edward Algorithm";
 
     private final static double GRAVITY_1_G = 9.8;
-    private final static double THRESHOLD = 0.14;
+    private final static double THRESHOLD = 0.2;
 
     private List<AccelerationData> accelerationDataList;
     private int numberOfSteps;
@@ -47,8 +47,6 @@ public class EdwardAlgorithm extends BaseAlgorithm {
         yValues = new double[3];
         zValues = new double[3];
     }
-
-    private int dataIndex = 0;
 
     @Override
     public void handleSensorData(AccelerationData ad) {
@@ -94,6 +92,7 @@ public class EdwardAlgorithm extends BaseAlgorithm {
         currentZGravity = zGravity;
         double inclinationAngle = calculateInclinationAngle(zGravity);
 
+        Log.d(TAG, "Inclination angle: " + Math.abs(inclinationAngle));
         if (!waitForStep) {
             if (Math.abs(inclinationAngle) > THRESHOLD) {
                 waitForStep = true;
